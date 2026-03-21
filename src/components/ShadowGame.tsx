@@ -4,7 +4,7 @@ import {
   animalNames,
   animalEmojis,
   type AnimalId,
-} from "./AnimalSVGs";
+} from "./animals";
 import { getRandomFunFact } from "./animalFunFacts";
 import { playCorrectSound, speakText } from "./gameAudio";
 
