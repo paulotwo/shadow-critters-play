@@ -56,10 +56,17 @@ const ShadowGame: React.FC = () => {
       if (id === round.shadow) {
         setFeedback("correct");
         setScore((s) => s + 1);
+        const fact = getRandomFunFact(round.shadow);
+        setFunFact(fact);
+        playCorrectSound();
+        // Speak animal name + fun fact after a brief pause
+        setTimeout(() => {
+          speakText(`${animalNames[round.shadow]}! ${fact}`);
+        }, 300);
       } else {
         setFeedback("wrong");
       }
-      setTimeout(nextRound, 1200);
+      setTimeout(nextRound, feedback === "correct" ? 4000 : 1200);
     },
     [feedback, round.shadow, nextRound]
   );
