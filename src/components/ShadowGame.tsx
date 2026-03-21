@@ -8,7 +8,11 @@ import {
 import { getRandomFunFact } from "./animalFunFacts";
 import { playCorrectSound, speakText } from "./gameAudio";
 
-const ALL_ANIMALS: AnimalId[] = ["cat", "dog", "elephant", "rabbit", "bird", "fish"];
+const ALL_ANIMALS: AnimalId[] = [
+  "cat", "dog", "elephant", "rabbit", "bird", "fish",
+  "lion", "turtle", "butterfly", "frog", "horse", "owl",
+  "penguin", "monkey", "giraffe", "bear", "dolphin", "snake", "bee", "pig",
+];
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
