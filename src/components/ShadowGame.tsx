@@ -66,7 +66,8 @@ const ShadowGame: React.FC = () => {
       } else {
         setFeedback("wrong");
       }
-      setTimeout(nextRound, feedback === "correct" ? 4000 : 1200);
+      const isCorrect = id === round.shadow;
+      setTimeout(nextRound, isCorrect ? 4500 : 1200);
     },
     [feedback, round.shadow, nextRound]
   );
