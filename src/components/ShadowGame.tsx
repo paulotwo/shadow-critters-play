@@ -43,6 +43,7 @@ const ShadowGame: React.FC = () => {
 
   const nextRound = useCallback(() => {
     setFeedback(null);
+    setFunFact(null);
     setSelectedId(null);
     setRound(pickRound());
   }, []);
