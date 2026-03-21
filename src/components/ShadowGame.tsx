@@ -4,11 +4,15 @@ import {
   animalNames,
   animalEmojis,
   type AnimalId,
-} from "./AnimalSVGs";
+} from "./animals";
 import { getRandomFunFact } from "./animalFunFacts";
 import { playCorrectSound, speakText } from "./gameAudio";
 
-const ALL_ANIMALS: AnimalId[] = ["cat", "dog", "elephant", "rabbit", "bird", "fish"];
+const ALL_ANIMALS: AnimalId[] = [
+  "cat", "dog", "elephant", "rabbit", "bird", "fish",
+  "lion", "turtle", "butterfly", "frog", "horse", "owl",
+  "penguin", "monkey", "giraffe", "bear", "dolphin", "snake", "bee", "pig",
+];
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
@@ -93,16 +97,16 @@ const ShadowGame: React.FC = () => {
           <p className="mb-8 text-xl text-muted-foreground">
             Descubra qual animal está escondido na sombra!
           </p>
-          <div className="mb-8 flex justify-center gap-3">
-            {ALL_ANIMALS.map((id, i) => {
+          <div className="mb-8 flex flex-wrap justify-center gap-2 max-w-sm">
+            {ALL_ANIMALS.slice(0, 8).map((id, i) => {
               const A = animalComponents[id];
               return (
                 <div
                   key={id}
                   className="animate-float"
-                  style={{ animationDelay: `${i * 0.3}s` }}
+                  style={{ animationDelay: `${i * 0.2}s` }}
                 >
-                  <A className="h-14 w-14 md:h-16 md:w-16" />
+                  <A className="h-10 w-10 md:h-12 md:w-12" />
                 </div>
               );
             })}
