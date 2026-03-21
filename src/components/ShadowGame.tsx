@@ -179,6 +179,11 @@ const ShadowGame: React.FC = () => {
           {feedback === "correct"
             ? `Isso! É o ${animalNames[round.shadow]}! ${animalEmojis[round.shadow]}`
             : `Ops! Era o ${animalNames[round.shadow]}! ${animalEmojis[round.shadow]}`}
+          {feedback === "correct" && funFact && (
+            <p className="mt-2 text-sm font-medium text-muted-foreground">
+              💡 {funFact}
+            </p>
+          )}
         </div>
       )}
 
