@@ -5,6 +5,8 @@ import {
   animalEmojis,
   type AnimalId,
 } from "./AnimalSVGs";
+import { getRandomFunFact } from "./animalFunFacts";
+import { playCorrectSound, speakText } from "./gameAudio";
 
 const ALL_ANIMALS: AnimalId[] = ["cat", "dog", "elephant", "rabbit", "bird", "fish"];
 
@@ -30,6 +32,7 @@ const ShadowGame: React.FC = () => {
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [funFact, setFunFact] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<AnimalId | null>(null);
   const [showIntro, setShowIntro] = useState(true);
 
@@ -40,6 +43,7 @@ const ShadowGame: React.FC = () => {
 
   const nextRound = useCallback(() => {
     setFeedback(null);
+    setFunFact(null);
     setSelectedId(null);
     setRound(pickRound());
   }, []);
@@ -52,10 +56,18 @@ const ShadowGame: React.FC = () => {
       if (id === round.shadow) {
         setFeedback("correct");
         setScore((s) => s + 1);
+        const fact = getRandomFunFact(round.shadow);
+        setFunFact(fact);
+        playCorrectSound();
+        // Speak animal name + fun fact after a brief pause
+        setTimeout(() => {
+          speakText(`${animalNames[round.shadow]}! ${fact}`);
+        }, 300);
       } else {
         setFeedback("wrong");
       }
-      setTimeout(nextRound, 1200);
+      const isCorrect = id === round.shadow;
+      setTimeout(nextRound, isCorrect ? 4500 : 1200);
     },
     [feedback, round.shadow, nextRound]
   );
@@ -167,6 +179,11 @@ const ShadowGame: React.FC = () => {
           {feedback === "correct"
             ? `Isso! É o ${animalNames[round.shadow]}! ${animalEmojis[round.shadow]}`
             : `Ops! Era o ${animalNames[round.shadow]}! ${animalEmojis[round.shadow]}`}
+          {feedback === "correct" && funFact && (
+            <p className="mt-2 text-sm font-medium text-muted-foreground">
+              💡 {funFact}
+            </p>
+          )}
         </div>
       )}
 
