@@ -32,6 +32,7 @@ const ShadowGame: React.FC = () => {
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
+  const [funFact, setFunFact] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<AnimalId | null>(null);
   const [showIntro, setShowIntro] = useState(true);
 
