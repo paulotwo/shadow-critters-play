@@ -5,6 +5,8 @@ import {
   animalEmojis,
   type AnimalId,
 } from "./AnimalSVGs";
+import { getRandomFunFact } from "./animalFunFacts";
+import { playCorrectSound, speakText } from "./gameAudio";
 
 const ALL_ANIMALS: AnimalId[] = ["cat", "dog", "elephant", "rabbit", "bird", "fish"];
 
