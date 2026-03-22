@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   animalComponents,
   animalNames,
@@ -6,7 +6,7 @@ import {
   type AnimalId,
 } from "./animals";
 import { getRandomFunFact } from "./animalFunFacts";
-import { playCorrectSound, speakText } from "./gameAudio";
+import { playCorrectSound, playWrongSound, speakText, enterFullscreen } from "./gameAudio";
 
 const ALL_ANIMALS: AnimalId[] = [
   "cat", "dog", "elephant", "rabbit", "bird", "fish",
@@ -39,22 +39,47 @@ const ShadowGame: React.FC = () => {
   const [funFact, setFunFact] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<AnimalId | null>(null);
   const [showIntro, setShowIntro] = useState(true);
+  const [hintId, setHintId] = useState<AnimalId | null>(null);
+  const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const ShadowAnimal = useMemo(
     () => animalComponents[round.shadow],
     [round.shadow]
   );
 
+  const clearHintTimer = useCallback(() => {
+    if (hintTimerRef.current) {
+      clearTimeout(hintTimerRef.current);
+      hintTimerRef.current = null;
+    }
+  }, []);
+
   const nextRound = useCallback(() => {
+    clearHintTimer();
     setFeedback(null);
     setFunFact(null);
     setSelectedId(null);
+    setHintId(null);
     setRound(pickRound());
-  }, []);
+  }, [clearHintTimer]);
+
+  // Start hint timer when a new round begins (no feedback yet)
+  useEffect(() => {
+    if (feedback || showIntro) return;
+    clearHintTimer();
+    hintTimerRef.current = setTimeout(() => {
+      setHintId(round.shadow);
+      // Remove hint after 1.2s
+      setTimeout(() => setHintId(null), 1200);
+    }, 5000);
+    return clearHintTimer;
+  }, [round, feedback, showIntro, clearHintTimer]);
 
   const handleGuess = useCallback(
     (id: AnimalId) => {
       if (feedback) return;
+      clearHintTimer();
+      setHintId(null);
       setSelectedId(id);
       setTotal((t) => t + 1);
       if (id === round.shadow) {
@@ -63,17 +88,19 @@ const ShadowGame: React.FC = () => {
         const fact = getRandomFunFact(round.shadow);
         setFunFact(fact);
         playCorrectSound();
-        // Speak animal name + fun fact after a brief pause
-        setTimeout(() => {
-          speakText(`${animalNames[round.shadow]}! ${fact}`);
+        // Speak animal name + fun fact, then advance
+        setTimeout(async () => {
+          await speakText(`${animalNames[round.shadow]}! ${fact}`);
+          // Small pause after speech ends before next round
+          setTimeout(nextRound, 600);
         }, 300);
       } else {
         setFeedback("wrong");
+        playWrongSound();
+        setTimeout(nextRound, 1200);
       }
-      const isCorrect = id === round.shadow;
-      setTimeout(nextRound, isCorrect ? 4500 : 1200);
     },
-    [feedback, round.shadow, nextRound]
+    [feedback, round.shadow, nextRound, clearHintTimer]
   );
 
   // Keyboard accessibility
@@ -81,6 +108,7 @@ const ShadowGame: React.FC = () => {
     const handler = (e: KeyboardEvent) => {
       if (showIntro && (e.key === "Enter" || e.key === " ")) {
         setShowIntro(false);
+        enterFullscreen();
       }
     };
     window.addEventListener("keydown", handler);
@@ -112,7 +140,10 @@ const ShadowGame: React.FC = () => {
             })}
           </div>
           <button
-            onClick={() => setShowIntro(false)}
+            onClick={() => {
+              setShowIntro(false);
+              enterFullscreen();
+            }}
             className="rounded-full bg-primary px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
           >
             Jogar! 🎮
@@ -160,7 +191,6 @@ const ShadowGame: React.FC = () => {
       >
         <ShadowAnimal className="h-40 w-40" isShadow />
 
-        {/* Feedback overlay */}
         {feedback === "correct" && (
           <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-game-correct/20">
             <span className="text-5xl">✅</span>
@@ -198,6 +228,7 @@ const ShadowGame: React.FC = () => {
           const isSelected = selectedId === id;
           const isCorrectChoice = feedback === "correct" && isSelected;
           const isWrongChoice = feedback === "wrong" && isSelected;
+          const isHinted = hintId === id;
 
           return (
             <button
@@ -215,6 +246,10 @@ const ShadowGame: React.FC = () => {
                   ? "ring-4 ring-game-wrong"
                   : feedback
                   ? "opacity-50"
+                  : ""
+              } ${
+                isHinted
+                  ? "ring-4 ring-primary/60 scale-105 shadow-lg animate-pulse"
                   : ""
               }`}
             >
