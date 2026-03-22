@@ -65,6 +65,13 @@ export function speakText(text: string): Promise<void> {
 // Request fullscreen and lock orientation to portrait
 export function enterFullscreen() {
   try {
+    // Skip fullscreen request when running as installed PWA (already fullscreen)
+    const isStandalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.matchMedia("(display-mode: fullscreen)").matches ||
+      (navigator as any).standalone === true;
+    if (isStandalone) return;
+
     const el = document.documentElement;
     if (el.requestFullscreen) {
       el.requestFullscreen().then(() => {
