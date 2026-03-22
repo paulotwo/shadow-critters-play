@@ -19,21 +19,59 @@ export function playCorrectSound() {
   }
 }
 
-// Speak text using Web Speech API (works offline, no API key needed)
-export function speakText(text: string) {
+// Wrong-answer buzzer sound
+export function playWrongSound() {
   try {
-    if (!("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "pt-BR";
-    utterance.rate = 0.9;
-    utterance.pitch = 1.2; // slightly higher pitch for kids
-    // Try to pick a Portuguese voice
-    const voices = window.speechSynthesis.getVoices();
-    const ptVoice = voices.find((v) => v.lang.startsWith("pt"));
-    if (ptVoice) utterance.voice = ptVoice;
-    window.speechSynthesis.speak(utterance);
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = "square";
+    osc.frequency.setValueAtTime(200, ctx.currentTime);
+    osc.frequency.linearRampToValueAtTime(120, ctx.currentTime + 0.3);
+    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.35);
   } catch {
-    // Speech not supported – silent fallback
+    // Audio not supported – silent fallback
   }
+}
+
+// Speak text using Web Speech API – returns a promise that resolves when speech ends
+export function speakText(text: string): Promise<void> {
+  return new Promise((resolve) => {
+    try {
+      if (!("speechSynthesis" in window)) { resolve(); return; }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "pt-BR";
+      utterance.rate = 0.9;
+      utterance.pitch = 1.2;
+      const voices = window.speechSynthesis.getVoices();
+      const ptVoice = voices.find((v) => v.lang.startsWith("pt"));
+      if (ptVoice) utterance.voice = ptVoice;
+      utterance.onend = () => resolve();
+      utterance.onerror = () => resolve();
+      window.speechSynthesis.speak(utterance);
+      // Safety timeout in case onend never fires
+      setTimeout(resolve, 15000);
+    } catch {
+      resolve();
+    }
+  });
+}
+
+// Request fullscreen and lock orientation to portrait
+export function enterFullscreen() {
+  try {
+    const el = document.documentElement;
+    if (el.requestFullscreen) {
+      el.requestFullscreen().then(() => {
+        try {
+          (screen.orientation as any)?.lock?.("portrait").catch(() => {});
+        } catch {}
+      }).catch(() => {});
+    }
+  } catch {}
 }
