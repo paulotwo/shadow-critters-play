@@ -2,11 +2,11 @@ import type React from "react";
 import type { AnimalProps, AnimalId } from "./types";
 export type { AnimalProps, AnimalId };
 
-import { Cat, Dog, Elephant, Rabbit, Bird, Fish } from "./originalAnimals";
 import {
+  Cat, Dog, Elephant, Rabbit, Bird, Fish,
   Lion, Turtle, Butterfly, Frog, Horse, Owl,
   Penguin, Monkey, Giraffe, Bear, Dolphin, Snake, Bee, Pig,
-} from "./newAnimals";
+} from "./allAnimals";
 
 export {
   Cat, Dog, Elephant, Rabbit, Bird, Fish,
