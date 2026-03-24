@@ -5,11 +5,9 @@ export type { DinoProps, DinoId };
 import {
   TRex, Triceratops, Stegosaurus, Brachiosaurus, Velociraptor,
   Pteranodon, Ankylosaurus, Spinosaurus, Parasaurolophus, Diplodocus,
-} from "./dinosaurs1";
-import {
   Pachycephalosaurus, Iguanodon, Compsognathus, Carnotaurus, Dilophosaurus,
   Apatosaurus, Plesiosaurus, Mosasaurus, Dimetrodon, Archaeopteryx,
-} from "./dinosaurs2";
+} from "./allDinosaurs";
 
 export {
   TRex, Triceratops, Stegosaurus, Brachiosaurus, Velociraptor,
