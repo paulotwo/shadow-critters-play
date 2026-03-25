@@ -1,19 +1,18 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import {
   animalComponents,
-  animalNames,
   animalEmojis,
   type AnimalId,
 } from "./animals";
 import {
   dinoComponents,
-  dinoNames,
   dinoEmojis,
   type DinoId,
 } from "./dinosaurs";
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
 import { playCorrectSound, playWrongSound, speakText, enterFullscreen } from "./gameAudio";
+import { useI18n, type Locale } from "@/i18n";
 
 type GameMode = "animals" | "dinos";
 type CreatureId = AnimalId | DinoId;
@@ -51,22 +50,27 @@ function pickRound<T>(pool: T[]): { shadow: T; options: T[] } {
 function getComponents(mode: GameMode) {
   return mode === "animals" ? animalComponents : dinoComponents;
 }
-function getNames(mode: GameMode) {
-  return mode === "animals" ? animalNames : dinoNames;
-}
 function getEmojis(mode: GameMode) {
   return mode === "animals" ? animalEmojis : dinoEmojis;
 }
 function getPool(mode: GameMode): CreatureId[] {
   return mode === "animals" ? ALL_ANIMALS : ALL_DINOS;
 }
-function getFunFact(mode: GameMode, id: CreatureId): string {
+function getFunFact(mode: GameMode, id: CreatureId, locale: Locale): string {
   return mode === "animals"
-    ? getRandomFunFact(id as AnimalId)
-    : getRandomDinoFunFact(id as DinoId);
+    ? getRandomFunFact(id as AnimalId, locale)
+    : getRandomDinoFunFact(id as DinoId, locale);
+}
+function getCreatureName(mode: GameMode, id: CreatureId, t: ReturnType<typeof useI18n>["t"]): string {
+  return mode === "animals"
+    ? t.animalNames[id as AnimalId]
+    : t.dinoNames[id as DinoId];
 }
 
+const LANG_FLAGS: Record<Locale, string> = { pt: "🇧🇷", en: "🇺🇸" };
+
 const ShadowGame: React.FC = () => {
+  const { locale, setLocale, t, speechLang } = useI18n();
   const [mode, setMode] = useState<GameMode>("animals");
   const [round, setRound] = useState(() => pickRound(getPool("animals")));
   const [score, setScore] = useState(0);
@@ -79,7 +83,6 @@ const ShadowGame: React.FC = () => {
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const components = getComponents(mode);
-  const names = getNames(mode);
   const emojis = getEmojis(mode);
 
   const ShadowCreature = useMemo(
@@ -123,11 +126,12 @@ const ShadowGame: React.FC = () => {
       if (id === round.shadow) {
         setFeedback("correct");
         setScore((s) => s + 1);
-        const fact = getFunFact(mode, round.shadow);
+        const fact = getFunFact(mode, round.shadow, locale);
         setFunFact(fact);
         playCorrectSound();
+        const name = getCreatureName(mode, round.shadow, t);
         setTimeout(async () => {
-          await speakText(`${(names as Record<string, string>)[round.shadow as string]}! ${fact}`);
+          await speakText(`${name}! ${fact}`, speechLang);
           setTimeout(nextRound, 600);
         }, 300);
       } else {
@@ -136,7 +140,7 @@ const ShadowGame: React.FC = () => {
         setTimeout(nextRound, 1200);
       }
     },
-    [feedback, round.shadow, nextRound, clearHintTimer, mode, names]
+    [feedback, round.shadow, nextRound, clearHintTimer, mode, locale, t, speechLang]
   );
 
   useEffect(() => {
@@ -159,15 +163,28 @@ const ShadowGame: React.FC = () => {
     enterFullscreen();
   };
 
+  const toggleLocale = () => setLocale(locale === "pt" ? "en" : "pt");
+
+  const langButton = (
+    <button
+      onClick={toggleLocale}
+      className="rounded-full bg-muted px-3 py-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
+      aria-label="Change language"
+    >
+      {LANG_FLAGS[locale === "pt" ? "en" : "en"]} {locale === "pt" ? "EN" : "PT"}
+    </button>
+  );
+
   if (showIntro) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
+        <div className="absolute top-4 right-4">{langButton}</div>
         <div className="animate-bounce-in text-center">
           <h1 className="mb-2 text-5xl font-bold text-primary md:text-6xl" style={{ lineHeight: 1.1 }}>
-            🌙 Jogo de Sombras
+            {t.ui.gameTitle}
           </h1>
           <p className="mb-8 text-xl text-muted-foreground">
-            Descubra qual animal está escondido na sombra!
+            {t.ui.gameSubtitle}
           </p>
           <div className="mb-8 flex flex-wrap justify-center gap-2 max-w-sm">
             {ALL_ANIMALS.slice(0, 4).map((id, i) => {
@@ -192,19 +209,22 @@ const ShadowGame: React.FC = () => {
               onClick={() => handleStartGame("animals")}
               className="w-56 rounded-full bg-primary px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
             >
-              🐾 Animais
+              {t.ui.animalsButton}
             </button>
             <button
               onClick={() => handleStartGame("dinos")}
               className="w-56 rounded-full bg-game-correct px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
             >
-              🦖 Dinossauros
+              {t.ui.dinosButton}
             </button>
           </div>
         </div>
       </div>
     );
   }
+
+  const shadowName = getCreatureName(mode, round.shadow, t);
+  const shadowEmoji = (emojis as Record<string, string>)[round.shadow as string];
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-background px-4 py-6">
@@ -218,19 +238,22 @@ const ShadowGame: React.FC = () => {
           }}
           className="rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
         >
-          ← Início
+          {t.ui.backButton}
         </button>
-        <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
-          <span className="text-lg">{mode === "animals" ? "🐾" : "🦖"}</span>
-          <span className="text-xl font-bold text-foreground tabular-nums">
-            {score}/{total}
-          </span>
+        <div className="flex items-center gap-2">
+          {langButton}
+          <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
+            <span className="text-lg">{mode === "animals" ? "🐾" : "🦖"}</span>
+            <span className="text-xl font-bold text-foreground tabular-nums">
+              {score}/{total}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Shadow display */}
       <div className="mb-2 text-center text-lg font-semibold text-muted-foreground">
-        {mode === "animals" ? "Qual é este animal?" : "Qual é este dinossauro?"}
+        {mode === "animals" ? t.ui.questionAnimal : t.ui.questionDino}
       </div>
       <div
         className={`relative mb-8 flex items-center justify-center rounded-3xl bg-card p-8 shadow-xl transition-all duration-300 ${
@@ -264,11 +287,11 @@ const ShadowGame: React.FC = () => {
           }`}
         >
           {feedback === "correct"
-            ? `Isso! É o ${(names as Record<string, string>)[round.shadow as string]}! ${(emojis as Record<string, string>)[round.shadow as string]}`
-            : `Ops! Era o ${(names as Record<string, string>)[round.shadow as string]}! ${(emojis as Record<string, string>)[round.shadow as string]}`}
+            ? `${t.ui.correctPrefix} ${shadowName}! ${shadowEmoji}`
+            : `${t.ui.wrongPrefix} ${shadowName}! ${shadowEmoji}`}
           {feedback === "correct" && funFact && (
             <p className="mt-2 text-sm font-medium text-muted-foreground">
-              💡 {funFact}
+              {t.ui.funFactPrefix} {funFact}
             </p>
           )}
         </div>
@@ -308,7 +331,7 @@ const ShadowGame: React.FC = () => {
             >
               <A className="h-20 w-20 md:h-24 md:w-24" />
               <span className="text-sm font-semibold text-foreground md:text-base">
-                {(names as Record<string, string>)[id as string]}
+                {getCreatureName(mode, id, t)}
               </span>
             </button>
           );
