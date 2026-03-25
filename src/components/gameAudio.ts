@@ -39,22 +39,22 @@ export function playWrongSound() {
 }
 
 // Speak text using Web Speech API – returns a promise that resolves when speech ends
-export function speakText(text: string): Promise<void> {
+export function speakText(text: string, lang: string = "pt-BR"): Promise<void> {
   return new Promise((resolve) => {
     try {
       if (!("speechSynthesis" in window)) { resolve(); return; }
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = "pt-BR";
+      utterance.lang = lang;
       utterance.rate = 0.9;
       utterance.pitch = 1.2;
       const voices = window.speechSynthesis.getVoices();
-      const ptVoice = voices.find((v) => v.lang.startsWith("pt"));
-      if (ptVoice) utterance.voice = ptVoice;
+      const langPrefix = lang.split("-")[0];
+      const voice = voices.find((v) => v.lang.startsWith(langPrefix));
+      if (voice) utterance.voice = voice;
       utterance.onend = () => resolve();
       utterance.onerror = () => resolve();
       window.speechSynthesis.speak(utterance);
-      // Safety timeout in case onend never fires
       setTimeout(resolve, 15000);
     } catch {
       resolve();
