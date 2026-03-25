@@ -443,7 +443,10 @@ export const animalFunFacts: Record<AnimalId, string[]> = {
   ],
 };
 
-export function getRandomFunFact(animalId: AnimalId): string {
-  const facts = animalFunFacts[animalId];
+import { animalFunFactsEn } from "./animalFunFactsEn";
+import type { Locale } from "@/i18n";
+
+export function getRandomFunFact(animalId: AnimalId, locale: Locale = "pt"): string {
+  const facts = locale === "en" ? animalFunFactsEn[animalId] : animalFunFacts[animalId];
   return facts[Math.floor(Math.random() * facts.length)];
 }
