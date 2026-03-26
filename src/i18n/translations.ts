@@ -1,7 +1,7 @@
 import type { AnimalId } from "@/components/animals/types";
 import type { DinoId } from "@/components/dinosaurs/types";
 
-export type Locale = "pt" | "en";
+export type Locale = "pt" | "en" | "es";
 
 export interface Translations {
   ui: {
@@ -15,6 +15,7 @@ export interface Translations {
     correctPrefix: string;
     wrongPrefix: string;
     funFactPrefix: string;
+    languageLabel: string;
   };
   animalNames: Record<AnimalId, string>;
   dinoNames: Record<DinoId, string>;
@@ -33,6 +34,7 @@ export const translations: Record<Locale, Translations> = {
       correctPrefix: "Isso! É o",
       wrongPrefix: "Ops! Era o",
       funFactPrefix: "💡",
+      languageLabel: "Idioma",
     },
     animalNames: {
       cat: "Gato", dog: "Cachorro", elephant: "Elefante", rabbit: "Coelho",
@@ -63,6 +65,7 @@ export const translations: Record<Locale, Translations> = {
       correctPrefix: "Yes! It's the",
       wrongPrefix: "Oops! It was the",
       funFactPrefix: "💡",
+      languageLabel: "Language",
     },
     animalNames: {
       cat: "Cat", dog: "Dog", elephant: "Elephant", rabbit: "Rabbit",
@@ -79,6 +82,37 @@ export const translations: Record<Locale, Translations> = {
       compsognathus: "Compsognathus", carnotaurus: "Carnotaurus", dilophosaurus: "Dilophosaurus",
       apatosaurus: "Apatosaurus", plesiosaurus: "Plesiosaurus", mosasaurus: "Mosasaurus",
       dimetrodon: "Dimetrodon", archaeopteryx: "Archaeopteryx",
+    },
+  },
+  es: {
+    ui: {
+      gameTitle: "🌙 Juego de Sombras",
+      gameSubtitle: "¡Descubre qué animal se esconde en la sombra!",
+      animalsButton: "🐾 Animales",
+      dinosButton: "🦖 Dinosaurios",
+      backButton: "← Inicio",
+      questionAnimal: "¿Qué animal es este?",
+      questionDino: "¿Qué dinosaurio es este?",
+      correctPrefix: "¡Sí! Es el",
+      wrongPrefix: "¡Ups! Era el",
+      funFactPrefix: "💡",
+      languageLabel: "Idioma",
+    },
+    animalNames: {
+      cat: "Gato", dog: "Perro", elephant: "Elefante", rabbit: "Conejo",
+      bird: "Pájaro", fish: "Pez", lion: "León", turtle: "Tortuga",
+      butterfly: "Mariposa", frog: "Rana", horse: "Caballo", owl: "Búho",
+      penguin: "Pingüino", monkey: "Mono", giraffe: "Jirafa", bear: "Oso",
+      dolphin: "Delfín", snake: "Serpiente", bee: "Abeja", pig: "Cerdo",
+    },
+    dinoNames: {
+      trex: "T-Rex", triceratops: "Triceratops", stegosaurus: "Estegosaurio",
+      brachiosaurus: "Braquiosaurio", velociraptor: "Velociraptor", pteranodon: "Pteranodonte",
+      ankylosaurus: "Anquilosaurio", spinosaurus: "Espinosaurio", parasaurolophus: "Parasaurolofo",
+      diplodocus: "Diplódoco", pachycephalosaurus: "Paquicefalosaurio", iguanodon: "Iguanodonte",
+      compsognathus: "Compsognato", carnotaurus: "Carnotauro", dilophosaurus: "Dilofosaurio",
+      apatosaurus: "Apatosaurio", plesiosaurus: "Plesiosauro", mosasaurus: "Mosasaurio",
+      dimetrodon: "Dimetrodonte", archaeopteryx: "Arqueoptérix",
     },
   },
 };

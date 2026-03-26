@@ -5,10 +5,18 @@ const STORAGE_KEY = "shadow-game-locale";
 
 function detectLocale(): Locale {
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved === "pt" || saved === "en") return saved;
+  if (saved === "pt" || saved === "en" || saved === "es") return saved;
   const browserLang = navigator.language || (navigator as any).userLanguage || "en";
-  return browserLang.startsWith("pt") ? "pt" : "en";
+  if (browserLang.startsWith("pt")) return "pt";
+  if (browserLang.startsWith("es")) return "es";
+  return "en";
 }
+
+const SPEECH_LANGS: Record<Locale, string> = {
+  pt: "pt-BR",
+  en: "en-US",
+  es: "es-ES",
+};
 
 interface I18nContextType {
   locale: Locale;
@@ -31,7 +39,7 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     locale,
     t: translations[locale],
     setLocale,
-    speechLang: locale === "pt" ? "pt-BR" : "en-US",
+    speechLang: SPEECH_LANGS[locale],
   }), [locale, setLocale]);
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
