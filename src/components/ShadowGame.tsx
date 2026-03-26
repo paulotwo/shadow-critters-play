@@ -12,7 +12,9 @@ import {
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
 import { playCorrectSound, playWrongSound, speakText, enterFullscreen } from "./gameAudio";
-import { useI18n, type Locale } from "@/i18n";
+import { useI18n } from "@/i18n";
+import type { Locale } from "@/i18n/translations";
+import LanguageSelector from "./LanguageSelector";
 
 type GameMode = "animals" | "dinos";
 type CreatureId = AnimalId | DinoId;
@@ -67,7 +69,7 @@ function getCreatureName(mode: GameMode, id: CreatureId, t: ReturnType<typeof us
     : t.dinoNames[id as DinoId];
 }
 
-const LANG_FLAGS: Record<Locale, string> = { pt: "🇧🇷", en: "🇺🇸" };
+// Language selector is now a separate component
 
 const ShadowGame: React.FC = () => {
   const { locale, setLocale, t, speechLang } = useI18n();
@@ -163,17 +165,7 @@ const ShadowGame: React.FC = () => {
     enterFullscreen();
   };
 
-  const toggleLocale = () => setLocale(locale === "pt" ? "en" : "pt");
-
-  const langButton = (
-    <button
-      onClick={toggleLocale}
-      className="rounded-full bg-muted px-3 py-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
-      aria-label="Change language"
-    >
-      {LANG_FLAGS[locale === "pt" ? "en" : "en"]} {locale === "pt" ? "EN" : "PT"}
-    </button>
-  );
+  const langButton = <LanguageSelector />;
 
   if (showIntro) {
     return (
