@@ -1,7 +1,7 @@
 import type { AnimalId } from "@/components/animals/types";
 import type { DinoId } from "@/components/dinosaurs/types";
 
-export type Locale = "pt" | "en" | "es";
+export type Locale = "pt" | "en" | "es" | "fr" | "it";
 
 export interface Translations {
   ui: {
@@ -113,6 +113,68 @@ export const translations: Record<Locale, Translations> = {
       compsognathus: "Compsognato", carnotaurus: "Carnotauro", dilophosaurus: "Dilofosaurio",
       apatosaurus: "Apatosaurio", plesiosaurus: "Plesiosauro", mosasaurus: "Mosasaurio",
       dimetrodon: "Dimetrodonte", archaeopteryx: "Arqueoptérix",
+    },
+  },
+  fr: {
+    ui: {
+      gameTitle: "🌙 Jeu d'Ombres",
+      gameSubtitle: "Découvre quel animal se cache dans l'ombre !",
+      animalsButton: "🐾 Animaux",
+      dinosButton: "🦖 Dinosaures",
+      backButton: "← Accueil",
+      questionAnimal: "Quel est cet animal ?",
+      questionDino: "Quel est ce dinosaure ?",
+      correctPrefix: "Oui ! C'est le",
+      wrongPrefix: "Oups ! C'était le",
+      funFactPrefix: "💡",
+      languageLabel: "Langue",
+    },
+    animalNames: {
+      cat: "Chat", dog: "Chien", elephant: "Éléphant", rabbit: "Lapin",
+      bird: "Oiseau", fish: "Poisson", lion: "Lion", turtle: "Tortue",
+      butterfly: "Papillon", frog: "Grenouille", horse: "Cheval", owl: "Chouette",
+      penguin: "Manchot", monkey: "Singe", giraffe: "Girafe", bear: "Ours",
+      dolphin: "Dauphin", snake: "Serpent", bee: "Abeille", pig: "Cochon",
+    },
+    dinoNames: {
+      trex: "T-Rex", triceratops: "Tricératops", stegosaurus: "Stégosaure",
+      brachiosaurus: "Brachiosaure", velociraptor: "Vélociraptor", pteranodon: "Ptéranodon",
+      ankylosaurus: "Ankylosaure", spinosaurus: "Spinosaure", parasaurolophus: "Parasaurolophus",
+      diplodocus: "Diplodocus", pachycephalosaurus: "Pachycéphalosaure", iguanodon: "Iguanodon",
+      compsognathus: "Compsognathus", carnotaurus: "Carnotaure", dilophosaurus: "Dilophosaure",
+      apatosaurus: "Apatosaure", plesiosaurus: "Plésiosaure", mosasaurus: "Mosasaure",
+      dimetrodon: "Dimétrodon", archaeopteryx: "Archéoptéryx",
+    },
+  },
+  it: {
+    ui: {
+      gameTitle: "🌙 Gioco delle Ombre",
+      gameSubtitle: "Scopri quale animale si nasconde nell'ombra!",
+      animalsButton: "🐾 Animali",
+      dinosButton: "🦖 Dinosauri",
+      backButton: "← Inizio",
+      questionAnimal: "Qual è questo animale?",
+      questionDino: "Qual è questo dinosauro?",
+      correctPrefix: "Sì! È il",
+      wrongPrefix: "Ops! Era il",
+      funFactPrefix: "💡",
+      languageLabel: "Lingua",
+    },
+    animalNames: {
+      cat: "Gatto", dog: "Cane", elephant: "Elefante", rabbit: "Coniglio",
+      bird: "Uccello", fish: "Pesce", lion: "Leone", turtle: "Tartaruga",
+      butterfly: "Farfalla", frog: "Rana", horse: "Cavallo", owl: "Gufo",
+      penguin: "Pinguino", monkey: "Scimmia", giraffe: "Giraffa", bear: "Orso",
+      dolphin: "Delfino", snake: "Serpente", bee: "Ape", pig: "Maiale",
+    },
+    dinoNames: {
+      trex: "T-Rex", triceratops: "Triceratopo", stegosaurus: "Stegosauro",
+      brachiosaurus: "Brachiosauro", velociraptor: "Velociraptor", pteranodon: "Pteranodonte",
+      ankylosaurus: "Anchilosauro", spinosaurus: "Spinosauro", parasaurolophus: "Parasaurolofo",
+      diplodocus: "Diplodoco", pachycephalosaurus: "Pachicefalosauro", iguanodon: "Iguanodonte",
+      compsognathus: "Compsognato", carnotaurus: "Carnotauro", dilophosaurus: "Dilofosauro",
+      apatosaurus: "Apatosauro", plesiosaurus: "Plesiosauro", mosasaurus: "Mosasauro",
+      dimetrodon: "Dimetrodonte", archaeopteryx: "Archaeopteryx",
     },
   },
 };
