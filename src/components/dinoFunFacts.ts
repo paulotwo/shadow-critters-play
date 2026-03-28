@@ -447,6 +447,7 @@ import { dinoFunFactsEn } from "./dinoFunFactsEn";
 import { dinoFunFactsEs } from "./dinoFunFactsEs";
 import { dinoFunFactsFr } from "./dinoFunFactsFr";
 import { dinoFunFactsIt } from "./dinoFunFactsIt";
+import { dinoFunFactsDe } from "./dinoFunFactsDe";
 import type { Locale } from "@/i18n/translations";
 
 const factsByLocale: Record<Locale, Record<DinoId, string[]>> = {
@@ -455,6 +456,7 @@ const factsByLocale: Record<Locale, Record<DinoId, string[]>> = {
   es: dinoFunFactsEs,
   fr: dinoFunFactsFr,
   it: dinoFunFactsIt,
+  de: dinoFunFactsDe,
 };
 
 export function getRandomDinoFunFact(id: DinoId, locale: Locale = "pt"): string {

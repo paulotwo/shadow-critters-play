@@ -447,6 +447,7 @@ import { animalFunFactsEn } from "./animalFunFactsEn";
 import { animalFunFactsEs } from "./animalFunFactsEs";
 import { animalFunFactsFr } from "./animalFunFactsFr";
 import { animalFunFactsIt } from "./animalFunFactsIt";
+import { animalFunFactsDe } from "./animalFunFactsDe";
 import type { Locale } from "@/i18n/translations";
 
 const factsByLocale: Record<Locale, Record<AnimalId, string[]>> = {
@@ -455,6 +456,7 @@ const factsByLocale: Record<Locale, Record<AnimalId, string[]>> = {
   es: animalFunFactsEs,
   fr: animalFunFactsFr,
   it: animalFunFactsIt,
+  de: animalFunFactsDe,
 };
 
 export function getRandomFunFact(animalId: AnimalId, locale: Locale = "pt"): string {
