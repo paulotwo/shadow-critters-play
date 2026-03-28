@@ -8,6 +8,7 @@ const LANGUAGES: { code: Locale; flag: string; label: string }[] = [
   { code: "es", flag: "🇪🇸", label: "Español" },
   { code: "fr", flag: "🇫🇷", label: "Français" },
   { code: "it", flag: "🇮🇹", label: "Italiano" },
+  { code: "de", flag: "🇩🇪", label: "Deutsch" },
 ];
 
 const LanguageSelector: React.FC = () => {

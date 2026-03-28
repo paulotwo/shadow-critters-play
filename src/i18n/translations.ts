@@ -1,7 +1,7 @@
 import type { AnimalId } from "@/components/animals/types";
 import type { DinoId } from "@/components/dinosaurs/types";
 
-export type Locale = "pt" | "en" | "es" | "fr" | "it";
+export type Locale = "pt" | "en" | "es" | "fr" | "it" | "de";
 
 export interface Translations {
   ui: {
@@ -175,6 +175,37 @@ export const translations: Record<Locale, Translations> = {
       compsognathus: "Compsognato", carnotaurus: "Carnotauro", dilophosaurus: "Dilofosauro",
       apatosaurus: "Apatosauro", plesiosaurus: "Plesiosauro", mosasaurus: "Mosasauro",
       dimetrodon: "Dimetrodonte", archaeopteryx: "Archaeopteryx",
+    },
+  },
+  de: {
+    ui: {
+      gameTitle: "🌙 Schattenspiel",
+      gameSubtitle: "Finde heraus, welches Tier sich im Schatten versteckt!",
+      animalsButton: "🐾 Tiere",
+      dinosButton: "🦖 Dinosaurier",
+      backButton: "← Start",
+      questionAnimal: "Welches Tier ist das?",
+      questionDino: "Welcher Dinosaurier ist das?",
+      correctPrefix: "Ja! Es ist der/die/das",
+      wrongPrefix: "Ups! Es war der/die/das",
+      funFactPrefix: "💡",
+      languageLabel: "Sprache",
+    },
+    animalNames: {
+      cat: "Katze", dog: "Hund", elephant: "Elefant", rabbit: "Kaninchen",
+      bird: "Vogel", fish: "Fisch", lion: "Löwe", turtle: "Schildkröte",
+      butterfly: "Schmetterling", frog: "Frosch", horse: "Pferd", owl: "Eule",
+      penguin: "Pinguin", monkey: "Affe", giraffe: "Giraffe", bear: "Bär",
+      dolphin: "Delfin", snake: "Schlange", bee: "Biene", pig: "Schwein",
+    },
+    dinoNames: {
+      trex: "T-Rex", triceratops: "Triceratops", stegosaurus: "Stegosaurus",
+      brachiosaurus: "Brachiosaurus", velociraptor: "Velociraptor", pteranodon: "Pteranodon",
+      ankylosaurus: "Ankylosaurus", spinosaurus: "Spinosaurus", parasaurolophus: "Parasaurolophus",
+      diplodocus: "Diplodocus", pachycephalosaurus: "Pachycephalosaurus", iguanodon: "Iguanodon",
+      compsognathus: "Compsognathus", carnotaurus: "Carnotaurus", dilophosaurus: "Dilophosaurus",
+      apatosaurus: "Apatosaurus", plesiosaurus: "Plesiosaurus", mosasaurus: "Mosasaurus",
+      dimetrodon: "Dimetrodon", archaeopteryx: "Archaeopteryx",
     },
   },
 };

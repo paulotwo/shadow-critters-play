@@ -5,12 +5,13 @@ const STORAGE_KEY = "shadow-game-locale";
 
 function detectLocale(): Locale {
   const saved = localStorage.getItem(STORAGE_KEY);
-  if (saved === "pt" || saved === "en" || saved === "es" || saved === "fr" || saved === "it") return saved;
+  if (saved === "pt" || saved === "en" || saved === "es" || saved === "fr" || saved === "it" || saved === "de") return saved;
   const browserLang = navigator.language || (navigator as any).userLanguage || "en";
   if (browserLang.startsWith("pt")) return "pt";
   if (browserLang.startsWith("es")) return "es";
   if (browserLang.startsWith("fr")) return "fr";
   if (browserLang.startsWith("it")) return "it";
+  if (browserLang.startsWith("de")) return "de";
   return "en";
 }
 
@@ -20,6 +21,7 @@ const SPEECH_LANGS: Record<Locale, string> = {
   es: "es-ES",
   fr: "fr-FR",
   it: "it-IT",
+  de: "de-DE",
 };
 
 interface I18nContextType {
