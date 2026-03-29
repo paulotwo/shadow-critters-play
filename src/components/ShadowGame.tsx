@@ -163,6 +163,7 @@ const ShadowGame: React.FC = () => {
     setRound(pickRound(getPool(selectedMode)));
     setShowIntro(false);
     enterFullscreen();
+    startBackgroundMusic();
   };
 
   const langButton = <LanguageSelector />;
