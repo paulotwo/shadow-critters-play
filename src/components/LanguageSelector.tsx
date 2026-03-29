@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
+import { speakText } from "./gameAudio";
+
+const SPEECH_LANGS: Record<Locale, string> = {
+  pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", it: "it-IT", de: "de-DE",
+};
 
 const LANGUAGES: { code: Locale; flag: string; label: string }[] = [
   { code: "pt", flag: "🇧🇷", label: "Português" },
