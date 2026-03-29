@@ -11,7 +11,7 @@ import {
 } from "./dinosaurs";
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
-import { playCorrectSound, playWrongSound, speakText, enterFullscreen } from "./gameAudio";
+import { playCorrectSound, playWrongSound, speakText, enterFullscreen, startBackgroundMusic, stopBackgroundMusic } from "./gameAudio";
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
