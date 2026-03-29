@@ -62,6 +62,89 @@ export function speakText(text: string, lang: string = "pt-BR"): Promise<void> {
   });
 }
 
+// ---------- Background Music (procedural, cheerful loop) ----------
+
+let bgCtx: AudioContext | null = null;
+let bgGain: GainNode | null = null;
+let bgInterval: ReturnType<typeof setInterval> | null = null;
+let bgPlaying = false;
+
+const MELODY_NOTES = [
+  // A cheerful, child-friendly melody in C major (frequencies in Hz)
+  392, 440, 494, 523, 494, 440, 392, 330,
+  349, 392, 440, 494, 440, 392, 349, 330,
+  262, 330, 392, 523, 494, 440, 392, 349,
+  330, 349, 392, 440, 392, 349, 330, 262,
+];
+
+const BASS_NOTES = [
+  131, 131, 165, 165, 175, 175, 131, 131,
+  131, 131, 165, 165, 175, 175, 131, 131,
+  131, 131, 165, 165, 175, 175, 131, 131,
+  131, 131, 165, 165, 175, 175, 131, 131,
+];
+
+function playBgNote(ctx: AudioContext, freq: number, time: number, duration: number, type: OscillatorType, volume: number) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.type = type;
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(volume, time);
+  gain.gain.exponentialRampToValueAtTime(0.001, time + duration * 0.95);
+  osc.connect(gain).connect(bgGain!);
+  osc.start(time);
+  osc.stop(time + duration);
+}
+
+function scheduleMelodyLoop() {
+  if (!bgCtx || !bgGain || !bgPlaying) return;
+  const ctx = bgCtx;
+  const noteDuration = 0.28;
+  const startTime = ctx.currentTime + 0.05;
+
+  MELODY_NOTES.forEach((freq, i) => {
+    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, "triangle", 0.08);
+  });
+
+  BASS_NOTES.forEach((freq, i) => {
+    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, "sine", 0.06);
+  });
+}
+
+export function startBackgroundMusic() {
+  if (bgPlaying) return;
+  try {
+    bgCtx = new AudioContext();
+    bgGain = bgCtx.createGain();
+    bgGain.gain.value = 1;
+    bgGain.connect(bgCtx.destination);
+    bgPlaying = true;
+    scheduleMelodyLoop();
+    const loopDuration = MELODY_NOTES.length * 0.28 * 1000;
+    bgInterval = setInterval(() => {
+      if (bgPlaying) scheduleMelodyLoop();
+    }, loopDuration);
+  } catch {
+    // Audio not supported
+  }
+}
+
+export function stopBackgroundMusic() {
+  bgPlaying = false;
+  if (bgInterval) {
+    clearInterval(bgInterval);
+    bgInterval = null;
+  }
+  if (bgGain) {
+    try { bgGain.gain.setValueAtTime(0, bgCtx?.currentTime ?? 0); } catch {}
+  }
+  if (bgCtx) {
+    try { bgCtx.close(); } catch {}
+    bgCtx = null;
+    bgGain = null;
+  }
+}
+
 // Request fullscreen and lock orientation to portrait
 export function enterFullscreen() {
   try {
