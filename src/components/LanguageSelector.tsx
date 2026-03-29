@@ -56,6 +56,7 @@ const LanguageSelector: React.FC = () => {
               onClick={() => {
                 setLocale(lang.code);
                 setOpen(false);
+                speakText(lang.label, SPEECH_LANGS[lang.code]);
               }}
               className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
                 lang.code === locale
