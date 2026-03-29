@@ -1,6 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
+import { speakText } from "./gameAudio";
+
+const SPEECH_LANGS: Record<Locale, string> = {
+  pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", it: "it-IT", de: "de-DE",
+};
 
 const LANGUAGES: { code: Locale; flag: string; label: string }[] = [
   { code: "pt", flag: "🇧🇷", label: "Português" },
@@ -51,6 +56,7 @@ const LanguageSelector: React.FC = () => {
               onClick={() => {
                 setLocale(lang.code);
                 setOpen(false);
+                speakText(lang.label, SPEECH_LANGS[lang.code]);
               }}
               className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors ${
                 lang.code === locale
