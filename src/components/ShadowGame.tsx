@@ -225,6 +225,7 @@ const ShadowGame: React.FC = () => {
       <div className="mb-6 flex w-full max-w-lg items-center justify-between">
         <button
           onClick={() => {
+            stopBackgroundMusic();
             setShowIntro(true);
             setScore(0);
             setTotal(0);
