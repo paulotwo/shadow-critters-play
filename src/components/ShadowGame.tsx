@@ -110,6 +110,8 @@ const ShadowGame: React.FC = () => {
 
   useEffect(() => {
     if (feedback || showIntro) return;
+    const question = mode === "animals" ? t.ui.questionAnimal : t.ui.questionDino;
+    speakText(question, speechLang);
     clearHintTimer();
     hintTimerRef.current = setTimeout(() => {
       setHintId(round.shadow);
