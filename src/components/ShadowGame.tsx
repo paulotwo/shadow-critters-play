@@ -11,7 +11,7 @@ import {
 } from "./dinosaurs";
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
-import { playCorrectSound, playWrongSound, speakText, enterFullscreen, startBackgroundMusic, stopBackgroundMusic } from "./gameAudio";
+import { playCorrectSound, playWrongSound, speakText, enterFullscreen, startBackgroundMusic, stopBackgroundMusic, switchMelody } from "./gameAudio";
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
@@ -129,7 +129,11 @@ const ShadowGame: React.FC = () => {
       setTotal((t) => t + 1);
       if (id === round.shadow) {
         setFeedback("correct");
-        setScore((s) => s + 1);
+        setScore((s) => {
+          const newScore = s + 1;
+          if (newScore % 3 === 0) switchMelody();
+          return newScore;
+        });
         const fact = getFunFact(mode, round.shadow, locale);
         setFunFact(fact);
         playCorrectSound();
