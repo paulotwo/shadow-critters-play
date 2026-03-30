@@ -121,15 +121,16 @@ function playBgNote(ctx: AudioContext, freq: number, time: number, duration: num
 function scheduleMelodyLoop() {
   if (!bgCtx || !bgGain || !bgPlaying) return;
   const ctx = bgCtx;
-  const noteDuration = 0.28;
+  const m = MELODIES[currentMelodyIndex];
+  const noteDuration = m.tempo;
   const startTime = ctx.currentTime + 0.05;
 
-  MELODY_NOTES.forEach((freq, i) => {
-    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, "triangle", 0.08);
+  m.melody.forEach((freq, i) => {
+    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, m.melodyType, 0.08);
   });
 
-  BASS_NOTES.forEach((freq, i) => {
-    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, "sine", 0.06);
+  m.bass.forEach((freq, i) => {
+    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, m.bassType, 0.06);
   });
 }
 
