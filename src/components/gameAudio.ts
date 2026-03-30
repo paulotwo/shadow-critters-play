@@ -134,22 +134,35 @@ function scheduleMelodyLoop() {
   });
 }
 
+function restartLoop() {
+  if (bgInterval) clearInterval(bgInterval);
+  const m = MELODIES[currentMelodyIndex];
+  const loopDuration = m.melody.length * m.tempo * 1000;
+  scheduleMelodyLoop();
+  bgInterval = setInterval(() => {
+    if (bgPlaying) scheduleMelodyLoop();
+  }, loopDuration);
+}
+
 export function startBackgroundMusic() {
   if (bgPlaying) return;
   try {
+    currentMelodyIndex = 0;
     bgCtx = new AudioContext();
     bgGain = bgCtx.createGain();
     bgGain.gain.value = 1;
     bgGain.connect(bgCtx.destination);
     bgPlaying = true;
-    scheduleMelodyLoop();
-    const loopDuration = MELODY_NOTES.length * 0.28 * 1000;
-    bgInterval = setInterval(() => {
-      if (bgPlaying) scheduleMelodyLoop();
-    }, loopDuration);
+    restartLoop();
   } catch {
     // Audio not supported
   }
+}
+
+export function switchMelody() {
+  if (!bgPlaying) return;
+  currentMelodyIndex = (currentMelodyIndex + 1) % MELODIES.length;
+  restartLoop();
 }
 
 export function stopBackgroundMusic() {
