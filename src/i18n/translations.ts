@@ -42,6 +42,9 @@ export const translations: Record<Locale, Translations> = {
       butterfly: "Borboleta", frog: "Sapo", horse: "Cavalo", owl: "Coruja",
       penguin: "Pinguim", monkey: "Macaco", giraffe: "Girafa", bear: "Urso",
       dolphin: "Golfinho", snake: "Cobra", bee: "Abelha", pig: "Porco",
+      panda: "Panda", koala: "Coala", zebra: "Zebra", shark: "Tubarão",
+      whale: "Baleia", crocodile: "Crocodilo", fox: "Raposa", duck: "Pato",
+      octopus: "Polvo", tiger: "Tigre",
     },
     dinoNames: {
       trex: "T-Rex", triceratops: "Tricerátops", stegosaurus: "Estegossauro",
@@ -73,6 +76,9 @@ export const translations: Record<Locale, Translations> = {
       butterfly: "Butterfly", frog: "Frog", horse: "Horse", owl: "Owl",
       penguin: "Penguin", monkey: "Monkey", giraffe: "Giraffe", bear: "Bear",
       dolphin: "Dolphin", snake: "Snake", bee: "Bee", pig: "Pig",
+      panda: "Panda", koala: "Koala", zebra: "Zebra", shark: "Shark",
+      whale: "Whale", crocodile: "Crocodile", fox: "Fox", duck: "Duck",
+      octopus: "Octopus", tiger: "Tiger",
     },
     dinoNames: {
       trex: "T-Rex", triceratops: "Triceratops", stegosaurus: "Stegosaurus",
@@ -104,6 +110,9 @@ export const translations: Record<Locale, Translations> = {
       butterfly: "Mariposa", frog: "Rana", horse: "Caballo", owl: "Búho",
       penguin: "Pingüino", monkey: "Mono", giraffe: "Jirafa", bear: "Oso",
       dolphin: "Delfín", snake: "Serpiente", bee: "Abeja", pig: "Cerdo",
+      panda: "Panda", koala: "Koala", zebra: "Cebra", shark: "Tiburón",
+      whale: "Ballena", crocodile: "Cocodrilo", fox: "Zorro", duck: "Pato",
+      octopus: "Pulpo", tiger: "Tigre",
     },
     dinoNames: {
       trex: "T-Rex", triceratops: "Triceratops", stegosaurus: "Estegosaurio",
@@ -135,6 +144,9 @@ export const translations: Record<Locale, Translations> = {
       butterfly: "Papillon", frog: "Grenouille", horse: "Cheval", owl: "Chouette",
       penguin: "Manchot", monkey: "Singe", giraffe: "Girafe", bear: "Ours",
       dolphin: "Dauphin", snake: "Serpent", bee: "Abeille", pig: "Cochon",
+      panda: "Panda", koala: "Koala", zebra: "Zèbre", shark: "Requin",
+      whale: "Baleine", crocodile: "Crocodile", fox: "Renard", duck: "Canard",
+      octopus: "Pieuvre", tiger: "Tigre",
     },
     dinoNames: {
       trex: "T-Rex", triceratops: "Tricératops", stegosaurus: "Stégosaure",
@@ -166,6 +178,9 @@ export const translations: Record<Locale, Translations> = {
       butterfly: "Farfalla", frog: "Rana", horse: "Cavallo", owl: "Gufo",
       penguin: "Pinguino", monkey: "Scimmia", giraffe: "Giraffa", bear: "Orso",
       dolphin: "Delfino", snake: "Serpente", bee: "Ape", pig: "Maiale",
+      panda: "Panda", koala: "Koala", zebra: "Zebra", shark: "Squalo",
+      whale: "Balena", crocodile: "Coccodrillo", fox: "Volpe", duck: "Anatra",
+      octopus: "Polpo", tiger: "Tigre",
     },
     dinoNames: {
       trex: "T-Rex", triceratops: "Triceratopo", stegosaurus: "Stegosauro",
@@ -197,6 +212,9 @@ export const translations: Record<Locale, Translations> = {
       butterfly: "Schmetterling", frog: "Frosch", horse: "Pferd", owl: "Eule",
       penguin: "Pinguin", monkey: "Affe", giraffe: "Giraffe", bear: "Bär",
       dolphin: "Delfin", snake: "Schlange", bee: "Biene", pig: "Schwein",
+      panda: "Panda", koala: "Koala", zebra: "Zebra", shark: "Hai",
+      whale: "Wal", crocodile: "Krokodil", fox: "Fuchs", duck: "Ente",
+      octopus: "Krake", tiger: "Tiger",
     },
     dinoNames: {
       trex: "T-Rex", triceratops: "Triceratops", stegosaurus: "Stegosaurus",
