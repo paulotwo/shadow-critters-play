@@ -69,20 +69,42 @@ let bgGain: GainNode | null = null;
 let bgInterval: ReturnType<typeof setInterval> | null = null;
 let bgPlaying = false;
 
-const MELODY_NOTES = [
-  // A cheerful, child-friendly melody in C major (frequencies in Hz)
-  392, 440, 494, 523, 494, 440, 392, 330,
-  349, 392, 440, 494, 440, 392, 349, 330,
-  262, 330, 392, 523, 494, 440, 392, 349,
-  330, 349, 392, 440, 392, 349, 330, 262,
+const MELODIES: { melody: number[]; bass: number[]; tempo: number; melodyType: OscillatorType; bassType: OscillatorType }[] = [
+  {
+    // Melody 1: Cheerful C major
+    melody: [392, 440, 494, 523, 494, 440, 392, 330, 349, 392, 440, 494, 440, 392, 349, 330,
+             262, 330, 392, 523, 494, 440, 392, 349, 330, 349, 392, 440, 392, 349, 330, 262],
+    bass:   [131, 131, 165, 165, 175, 175, 131, 131, 131, 131, 165, 165, 175, 175, 131, 131,
+             131, 131, 165, 165, 175, 175, 131, 131, 131, 131, 165, 165, 175, 175, 131, 131],
+    tempo: 0.28, melodyType: "triangle", bassType: "sine",
+  },
+  {
+    // Melody 2: Playful G major waltz
+    melody: [392, 494, 587, 494, 392, 330, 294, 330, 392, 440, 523, 587, 523, 440, 392, 330,
+             294, 392, 494, 587, 659, 587, 494, 392, 330, 392, 440, 494, 440, 392, 330, 294],
+    bass:   [196, 196, 247, 247, 196, 196, 165, 165, 196, 196, 247, 247, 196, 196, 165, 165,
+             147, 147, 196, 196, 247, 247, 196, 196, 165, 165, 196, 196, 147, 147, 165, 165],
+    tempo: 0.30, melodyType: "sine", bassType: "triangle",
+  },
+  {
+    // Melody 3: Bouncy F major
+    melody: [349, 440, 523, 440, 349, 523, 659, 523, 349, 392, 440, 523, 587, 523, 440, 349,
+             262, 349, 440, 523, 659, 523, 440, 349, 330, 349, 392, 440, 523, 440, 349, 262],
+    bass:   [175, 175, 220, 220, 175, 175, 131, 131, 175, 175, 196, 196, 220, 220, 175, 175,
+             131, 131, 175, 175, 220, 220, 175, 175, 165, 165, 196, 196, 220, 220, 131, 131],
+    tempo: 0.25, melodyType: "triangle", bassType: "sine",
+  },
+  {
+    // Melody 4: Gentle D major lullaby-like
+    melody: [294, 330, 370, 440, 494, 440, 370, 330, 294, 370, 440, 494, 554, 494, 440, 370,
+             294, 330, 370, 440, 554, 494, 440, 370, 330, 370, 440, 494, 440, 370, 330, 294],
+    bass:   [147, 147, 185, 185, 220, 220, 147, 147, 147, 147, 185, 185, 220, 220, 147, 147,
+             147, 147, 185, 185, 220, 220, 147, 147, 165, 165, 185, 185, 220, 220, 147, 147],
+    tempo: 0.32, melodyType: "sine", bassType: "sine",
+  },
 ];
 
-const BASS_NOTES = [
-  131, 131, 165, 165, 175, 175, 131, 131,
-  131, 131, 165, 165, 175, 175, 131, 131,
-  131, 131, 165, 165, 175, 175, 131, 131,
-  131, 131, 165, 165, 175, 175, 131, 131,
-];
+let currentMelodyIndex = 0;
 
 function playBgNote(ctx: AudioContext, freq: number, time: number, duration: number, type: OscillatorType, volume: number) {
   const osc = ctx.createOscillator();
