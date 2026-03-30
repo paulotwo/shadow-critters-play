@@ -129,7 +129,11 @@ const ShadowGame: React.FC = () => {
       setTotal((t) => t + 1);
       if (id === round.shadow) {
         setFeedback("correct");
-        setScore((s) => s + 1);
+        setScore((s) => {
+          const newScore = s + 1;
+          if (newScore % 3 === 0) switchMelody();
+          return newScore;
+        });
         const fact = getFunFact(mode, round.shadow, locale);
         setFunFact(fact);
         playCorrectSound();
