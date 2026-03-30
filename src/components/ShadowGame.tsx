@@ -23,6 +23,7 @@ const ALL_ANIMALS: AnimalId[] = [
   "cat", "dog", "elephant", "rabbit", "bird", "fish",
   "lion", "turtle", "butterfly", "frog", "horse", "owl",
   "penguin", "monkey", "giraffe", "bear", "dolphin", "snake", "bee", "pig",
+  "panda", "koala", "zebra", "shark", "whale", "crocodile", "fox", "duck", "octopus", "tiger",
 ];
 
 const ALL_DINOS: DinoId[] = [
