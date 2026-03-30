@@ -83,6 +83,7 @@ const ShadowGame: React.FC = () => {
   const [selectedId, setSelectedId] = useState<CreatureId | null>(null);
   const [showIntro, setShowIntro] = useState(true);
   const [hintId, setHintId] = useState<CreatureId | null>(null);
+  const [musicOn, setMusicOn] = useState(true);
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const components = getComponents(mode);
@@ -242,6 +243,21 @@ const ShadowGame: React.FC = () => {
           {t.ui.backButton}
         </button>
         <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              if (musicOn) {
+                stopBackgroundMusic();
+                setMusicOn(false);
+              } else {
+                startBackgroundMusic();
+                setMusicOn(true);
+              }
+            }}
+            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            title={musicOn ? "Mute" : "Unmute"}
+          >
+            {musicOn ? "🔊" : "🔇"}
+          </button>
           {langButton}
           <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
             <span className="text-lg">{mode === "animals" ? "🐾" : "🦖"}</span>
