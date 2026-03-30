@@ -11,4 +11,5 @@ export type AnimalId =
   | "cat" | "dog" | "elephant" | "rabbit" | "bird" | "fish"
   | "lion" | "turtle" | "butterfly" | "frog" | "horse" | "owl"
   | "penguin" | "monkey" | "giraffe" | "bear" | "dolphin" | "snake"
-  | "bee" | "pig";
+  | "bee" | "pig" | "panda" | "koala" | "zebra" | "shark"
+  | "whale" | "crocodile" | "fox" | "duck" | "octopus" | "tiger";
