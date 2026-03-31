@@ -162,7 +162,23 @@ export function startBackgroundMusic() {
 export function switchMelody() {
   if (!bgPlaying) return;
   currentMelodyIndex = (currentMelodyIndex + 1) % MELODIES.length;
-  restartLoop();
+
+  // Close old context to stop all scheduled notes, then create a fresh one
+  if (bgInterval) { clearInterval(bgInterval); bgInterval = null; }
+  const oldCtx = bgCtx;
+  const oldGain = bgGain;
+  if (oldGain && oldCtx) {
+    try { oldGain.gain.linearRampToValueAtTime(0, oldCtx.currentTime + 0.3); } catch {}
+    setTimeout(() => { try { oldCtx.close(); } catch {} }, 400);
+  }
+
+  try {
+    bgCtx = new AudioContext();
+    bgGain = bgCtx.createGain();
+    bgGain.gain.value = 1;
+    bgGain.connect(bgCtx.destination);
+    restartLoop();
+  } catch {}
 }
 
 export function stopBackgroundMusic() {
