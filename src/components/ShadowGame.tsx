@@ -172,6 +172,8 @@ const ShadowGame: React.FC = () => {
     setShowIntro(false);
     enterFullscreen();
     startBackgroundMusic();
+    const question = selectedMode === "animals" ? t.ui.questionAnimal : t.ui.questionDino;
+    speakText(question, speechLang);
   };
 
   const langButton = <LanguageSelector />;
