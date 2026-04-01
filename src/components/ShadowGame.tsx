@@ -259,7 +259,7 @@ const ShadowGame: React.FC = () => {
             {score}/{total}
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => {
               if (musicOn) {
@@ -270,7 +270,7 @@ const ShadowGame: React.FC = () => {
                 setMusicOn(true);
               }
             }}
-            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
+            className="rounded-lg bg-muted p-2.5 text-lg transition-transform active:scale-95"
             title={musicOn ? "Mute" : "Unmute"}
           >
             {musicOn ? "🔊" : "🔇"}
