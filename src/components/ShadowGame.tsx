@@ -277,7 +277,7 @@ const ShadowGame: React.FC = () => {
           </button>
           <button
             onClick={() => setFunFactsOn((v) => !v)}
-            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
+            className="rounded-lg bg-muted p-2.5 text-lg transition-transform active:scale-95"
             title={funFactsOn ? "Disable fun facts" : "Enable fun facts"}
           >
             {funFactsOn ? "💡" : "🚫"}
