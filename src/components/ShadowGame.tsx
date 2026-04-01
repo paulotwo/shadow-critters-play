@@ -248,7 +248,7 @@ const ShadowGame: React.FC = () => {
             setScore(0);
             setTotal(0);
           }}
-          className="rounded-lg bg-muted p-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
+          className="rounded-lg bg-muted p-2.5 text-lg font-semibold text-muted-foreground transition-transform active:scale-95"
           aria-label={t.ui.backButton}
         >
           ◀
