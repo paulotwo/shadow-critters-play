@@ -238,7 +238,7 @@ const ShadowGame: React.FC = () => {
   const shadowEmoji = (emojis as Record<string, string>)[round.shadow as string];
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background px-4 py-6">
+    <div className="flex min-h-screen flex-col items-center bg-background px-3 py-3 sm:px-4 sm:py-6">
       {/* Header */}
       <div className="mb-4 flex w-full max-w-lg items-center justify-between">
         <button
