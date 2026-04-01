@@ -3,17 +3,24 @@ import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import { speakText } from "./gameAudio";
 
+import flagBr from "@/assets/flags/br.png";
+import flagUs from "@/assets/flags/us.png";
+import flagEs from "@/assets/flags/es.png";
+import flagFr from "@/assets/flags/fr.png";
+import flagIt from "@/assets/flags/it.png";
+import flagDe from "@/assets/flags/de.png";
+
 const SPEECH_LANGS: Record<Locale, string> = {
   pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", it: "it-IT", de: "de-DE",
 };
 
 const LANGUAGES: { code: Locale; flag: string; label: string }[] = [
-  { code: "pt", flag: "🇧🇷", label: "Português" },
-  { code: "en", flag: "🇺🇸", label: "English" },
-  { code: "es", flag: "🇪🇸", label: "Español" },
-  { code: "fr", flag: "🇫🇷", label: "Français" },
-  { code: "it", flag: "🇮🇹", label: "Italiano" },
-  { code: "de", flag: "🇩🇪", label: "Deutsch" },
+  { code: "pt", flag: flagBr, label: "Português" },
+  { code: "en", flag: flagUs, label: "English" },
+  { code: "es", flag: flagEs, label: "Español" },
+  { code: "fr", flag: flagFr, label: "Français" },
+  { code: "it", flag: flagIt, label: "Italiano" },
+  { code: "de", flag: flagDe, label: "Deutsch" },
 ];
 
 const LanguageSelector: React.FC = () => {
@@ -44,7 +51,7 @@ const LanguageSelector: React.FC = () => {
         className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
         aria-label="Change language"
       >
-        <span className="text-lg leading-none">{current.flag}</span>
+        <img src={current.flag} alt={current.label} className="h-5 w-7 rounded-sm object-cover" />
         <span className="hidden sm:inline">{current.label}</span>
       </button>
 
@@ -64,7 +71,7 @@ const LanguageSelector: React.FC = () => {
                   : "text-foreground hover:bg-muted"
               }`}
             >
-              <span className="text-lg leading-none">{lang.flag}</span>
+              <img src={lang.flag} alt={lang.label} className="h-5 w-7 rounded-sm object-cover" />
               <span>{lang.label}</span>
             </button>
           ))}
