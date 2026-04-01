@@ -142,12 +142,13 @@ const ShadowGame: React.FC = () => {
           if (newScore % 3 === 0) switchMelody();
           return newScore;
         });
-        const fact = getFunFact(mode, round.shadow, locale);
+        const fact = funFactsOn ? getFunFact(mode, round.shadow, locale) : null;
         setFunFact(fact);
         playCorrectSound();
         const name = getCreatureName(mode, round.shadow, t);
+        const speechText = fact ? `${name}! ${fact}` : `${name}!`;
         setTimeout(async () => {
-          await speakText(`${name}! ${fact}`, speechLang);
+          await speakText(speechText, speechLang);
           setTimeout(nextRound, 600);
         }, 300);
       } else {
