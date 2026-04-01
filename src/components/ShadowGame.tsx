@@ -173,7 +173,8 @@ const ShadowGame: React.FC = () => {
     setMode(selectedMode);
     setScore(0);
     setTotal(0);
-    setRound(pickRound(getPool(selectedMode)));
+    recentShadowsRef.current = [];
+    setRound(pickRound(getPool(selectedMode), []));
     setShowIntro(false);
     enterFullscreen();
     startBackgroundMusic();
