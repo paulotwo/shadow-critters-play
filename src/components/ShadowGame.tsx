@@ -111,7 +111,10 @@ const ShadowGame: React.FC = () => {
     setFunFact(null);
     setSelectedId(null);
     setHintId(null);
-    setRound(pickRound(getPool(mode)));
+    setRound((prev) => {
+      recentShadowsRef.current = [...recentShadowsRef.current, prev.shadow].slice(-15);
+      return pickRound(getPool(mode), recentShadowsRef.current);
+    });
   }, [clearHintTimer, mode]);
 
   useEffect(() => {
