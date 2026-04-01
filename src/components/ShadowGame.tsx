@@ -157,7 +157,7 @@ const ShadowGame: React.FC = () => {
         setTimeout(nextRound, 1200);
       }
     },
-    [feedback, round.shadow, nextRound, clearHintTimer, mode, locale, t, speechLang]
+    [feedback, round.shadow, nextRound, clearHintTimer, mode, locale, t, speechLang, funFactsOn]
   );
 
   useEffect(() => {
