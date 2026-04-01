@@ -248,7 +248,7 @@ const ShadowGame: React.FC = () => {
             setScore(0);
             setTotal(0);
           }}
-          className="rounded-lg bg-muted p-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
+          className="rounded-lg bg-muted p-2.5 text-lg font-semibold text-muted-foreground transition-transform active:scale-95"
           aria-label={t.ui.backButton}
         >
           ◀
@@ -259,7 +259,7 @@ const ShadowGame: React.FC = () => {
             {score}/{total}
           </span>
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1.5">
           <button
             onClick={() => {
               if (musicOn) {
@@ -270,14 +270,14 @@ const ShadowGame: React.FC = () => {
                 setMusicOn(true);
               }
             }}
-            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
+            className="rounded-lg bg-muted p-2.5 text-lg transition-transform active:scale-95"
             title={musicOn ? "Mute" : "Unmute"}
           >
             {musicOn ? "🔊" : "🔇"}
           </button>
           <button
             onClick={() => setFunFactsOn((v) => !v)}
-            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
+            className="rounded-lg bg-muted p-2.5 text-lg transition-transform active:scale-95"
             title={funFactsOn ? "Disable fun facts" : "Enable fun facts"}
           >
             {funFactsOn ? "💡" : "🚫"}
