@@ -268,6 +268,13 @@ const ShadowGame: React.FC = () => {
           >
             {musicOn ? "🔊" : "🔇"}
           </button>
+          <button
+            onClick={() => setFunFactsOn((v) => !v)}
+            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            title={funFactsOn ? "Disable fun facts" : "Enable fun facts"}
+          >
+            {funFactsOn ? "💡" : "🚫"}
+          </button>
           {langButton}
           <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
             <span className="text-lg">{mode === "animals" ? "🐾" : "🦖"}</span>
