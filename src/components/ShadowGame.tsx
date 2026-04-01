@@ -372,6 +372,7 @@ const ShadowGame: React.FC = () => {
           );
         })}
       </div>
+    </div>
   );
 };
 
