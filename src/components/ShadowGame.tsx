@@ -42,10 +42,13 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function pickRound<T>(pool: T[]): { shadow: T; options: T[] } {
-  const shuffled = shuffle(pool);
+function pickRound<T>(pool: T[], recentList: T[]): { shadow: T; options: T[] } {
+  const available = pool.filter((x) => !recentList.includes(x));
+  const candidates = available.length >= 3 ? available : pool;
+  const shuffled = shuffle(candidates);
   const shadow = shuffled[0];
-  const distractors = shuffled.slice(1, 3);
+  const others = shuffle(pool.filter((x) => x !== shadow));
+  const distractors = others.slice(0, 2);
   const options = shuffle([shadow, ...distractors]);
   return { shadow, options };
 }
@@ -75,7 +78,8 @@ function getCreatureName(mode: GameMode, id: CreatureId, t: ReturnType<typeof us
 const ShadowGame: React.FC = () => {
   const { locale, setLocale, t, speechLang } = useI18n();
   const [mode, setMode] = useState<GameMode>("animals");
-  const [round, setRound] = useState(() => pickRound(getPool("animals")));
+  const recentShadowsRef = useRef<CreatureId[]>([]);
+  const [round, setRound] = useState(() => pickRound(getPool("animals"), []));
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
@@ -107,7 +111,10 @@ const ShadowGame: React.FC = () => {
     setFunFact(null);
     setSelectedId(null);
     setHintId(null);
-    setRound(pickRound(getPool(mode)));
+    setRound((prev) => {
+      recentShadowsRef.current = [...recentShadowsRef.current, prev.shadow].slice(-15);
+      return pickRound(getPool(mode), recentShadowsRef.current);
+    });
   }, [clearHintTimer, mode]);
 
   useEffect(() => {
@@ -166,7 +173,8 @@ const ShadowGame: React.FC = () => {
     setMode(selectedMode);
     setScore(0);
     setTotal(0);
-    setRound(pickRound(getPool(selectedMode)));
+    recentShadowsRef.current = [];
+    setRound(pickRound(getPool(selectedMode), []));
     setShowIntro(false);
     enterFullscreen();
     startBackgroundMusic();
