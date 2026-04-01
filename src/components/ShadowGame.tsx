@@ -88,6 +88,7 @@ const ShadowGame: React.FC = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [hintId, setHintId] = useState<CreatureId | null>(null);
   const [musicOn, setMusicOn] = useState(true);
+  const [funFactsOn, setFunFactsOn] = useState(true);
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const components = getComponents(mode);
@@ -141,12 +142,13 @@ const ShadowGame: React.FC = () => {
           if (newScore % 3 === 0) switchMelody();
           return newScore;
         });
-        const fact = getFunFact(mode, round.shadow, locale);
+        const fact = funFactsOn ? getFunFact(mode, round.shadow, locale) : null;
         setFunFact(fact);
         playCorrectSound();
         const name = getCreatureName(mode, round.shadow, t);
+        const speechText = fact ? `${name}! ${fact}` : `${name}!`;
         setTimeout(async () => {
-          await speakText(`${name}! ${fact}`, speechLang);
+          await speakText(speechText, speechLang);
           setTimeout(nextRound, 600);
         }, 300);
       } else {
@@ -155,7 +157,7 @@ const ShadowGame: React.FC = () => {
         setTimeout(nextRound, 1200);
       }
     },
-    [feedback, round.shadow, nextRound, clearHintTimer, mode, locale, t, speechLang]
+    [feedback, round.shadow, nextRound, clearHintTimer, mode, locale, t, speechLang, funFactsOn]
   );
 
   useEffect(() => {
@@ -265,6 +267,13 @@ const ShadowGame: React.FC = () => {
             title={musicOn ? "Mute" : "Unmute"}
           >
             {musicOn ? "🔊" : "🔇"}
+          </button>
+          <button
+            onClick={() => setFunFactsOn((v) => !v)}
+            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            title={funFactsOn ? "Disable fun facts" : "Enable fun facts"}
+          >
+            {funFactsOn ? "💡" : "🚫"}
           </button>
           {langButton}
           <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
