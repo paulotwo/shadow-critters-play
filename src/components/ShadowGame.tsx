@@ -240,7 +240,7 @@ const ShadowGame: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col items-center bg-background px-4 py-6">
       {/* Header */}
-      <div className="mb-6 flex w-full max-w-lg items-center justify-between">
+      <div className="mb-4 flex w-full max-w-lg items-center justify-between">
         <button
           onClick={() => {
             stopBackgroundMusic();
@@ -248,11 +248,18 @@ const ShadowGame: React.FC = () => {
             setScore(0);
             setTotal(0);
           }}
-          className="rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
+          className="rounded-lg bg-muted p-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
+          aria-label={t.ui.backButton}
         >
-          {t.ui.backButton}
+          ◀
         </button>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 rounded-full bg-card px-4 py-1.5 shadow">
+          <span className="text-base">{mode === "animals" ? "🐾" : "🦖"}</span>
+          <span className="text-lg font-bold text-foreground tabular-nums">
+            {score}/{total}
+          </span>
+        </div>
+        <div className="flex items-center gap-1">
           <button
             onClick={() => {
               if (musicOn) {
@@ -263,25 +270,19 @@ const ShadowGame: React.FC = () => {
                 setMusicOn(true);
               }
             }}
-            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
             title={musicOn ? "Mute" : "Unmute"}
           >
             {musicOn ? "🔊" : "🔇"}
           </button>
           <button
             onClick={() => setFunFactsOn((v) => !v)}
-            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
             title={funFactsOn ? "Disable fun facts" : "Enable fun facts"}
           >
             {funFactsOn ? "💡" : "🚫"}
           </button>
           {langButton}
-          <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
-            <span className="text-lg">{mode === "animals" ? "🐾" : "🦖"}</span>
-            <span className="text-xl font-bold text-foreground tabular-nums">
-              {score}/{total}
-            </span>
-          </div>
         </div>
       </div>
 
