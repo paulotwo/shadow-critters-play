@@ -88,6 +88,7 @@ const ShadowGame: React.FC = () => {
   const [showIntro, setShowIntro] = useState(true);
   const [hintId, setHintId] = useState<CreatureId | null>(null);
   const [musicOn, setMusicOn] = useState(true);
+  const [funFactsOn, setFunFactsOn] = useState(true);
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const components = getComponents(mode);
