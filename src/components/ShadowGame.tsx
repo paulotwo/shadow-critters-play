@@ -78,7 +78,8 @@ function getCreatureName(mode: GameMode, id: CreatureId, t: ReturnType<typeof us
 const ShadowGame: React.FC = () => {
   const { locale, setLocale, t, speechLang } = useI18n();
   const [mode, setMode] = useState<GameMode>("animals");
-  const [round, setRound] = useState(() => pickRound(getPool("animals")));
+  const recentShadowsRef = useRef<CreatureId[]>([]);
+  const [round, setRound] = useState(() => pickRound(getPool("animals"), []));
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
