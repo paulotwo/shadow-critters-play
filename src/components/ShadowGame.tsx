@@ -238,9 +238,9 @@ const ShadowGame: React.FC = () => {
   const shadowEmoji = (emojis as Record<string, string>)[round.shadow as string];
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background px-3 py-3 sm:px-4 sm:py-6">
+    <div className="flex min-h-screen flex-col items-center bg-background px-4 py-6">
       {/* Header */}
-      <div className="mb-4 flex w-full max-w-lg items-center justify-between">
+      <div className="mb-6 flex w-full max-w-lg items-center justify-between">
         <button
           onClick={() => {
             stopBackgroundMusic();
@@ -248,18 +248,11 @@ const ShadowGame: React.FC = () => {
             setScore(0);
             setTotal(0);
           }}
-          className="rounded-lg bg-muted p-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
-          aria-label={t.ui.backButton}
+          className="rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
         >
-          ◀
+          {t.ui.backButton}
         </button>
-        <div className="flex items-center gap-2 rounded-full bg-card px-4 py-1.5 shadow">
-          <span className="text-base">{mode === "animals" ? "🐾" : "🦖"}</span>
-          <span className="text-lg font-bold text-foreground tabular-nums">
-            {score}/{total}
-          </span>
-        </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           <button
             onClick={() => {
               if (musicOn) {
@@ -270,46 +263,52 @@ const ShadowGame: React.FC = () => {
                 setMusicOn(true);
               }
             }}
-            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
+            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
             title={musicOn ? "Mute" : "Unmute"}
           >
             {musicOn ? "🔊" : "🔇"}
           </button>
           <button
             onClick={() => setFunFactsOn((v) => !v)}
-            className="rounded-lg bg-muted p-2 text-base transition-transform active:scale-95"
+            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
             title={funFactsOn ? "Disable fun facts" : "Enable fun facts"}
           >
             {funFactsOn ? "💡" : "🚫"}
           </button>
           {langButton}
+          <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
+            <span className="text-lg">{mode === "animals" ? "🐾" : "🦖"}</span>
+            <span className="text-xl font-bold text-foreground tabular-nums">
+              {score}/{total}
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Shadow display */}
-      <div className="mb-1 text-center text-base sm:text-lg font-semibold text-muted-foreground">
+      <div className="mb-2 text-center text-lg font-semibold text-muted-foreground">
         {mode === "animals" ? t.ui.questionAnimal : t.ui.questionDino}
       </div>
       <div
-        className={`relative mb-4 sm:mb-8 flex items-center justify-center rounded-3xl bg-card p-6 sm:p-8 shadow-xl transition-all duration-300 ${
+        className={`relative mb-8 flex items-center justify-center rounded-3xl bg-card p-8 shadow-xl transition-all duration-300 ${
           feedback === "correct"
             ? "animate-pop-correct ring-4 ring-game-correct"
             : feedback === "wrong"
             ? "animate-shake-wrong ring-4 ring-game-wrong"
             : ""
         }`}
-        style={{ width: "min(55vw, 220px)", height: "min(55vw, 220px)" }}
+        style={{ width: 220, height: 220 }}
       >
-        <ShadowCreature className="h-[min(40vw,160px)] w-[min(40vw,160px)]" isShadow />
+        <ShadowCreature className="h-40 w-40" isShadow />
 
         {feedback === "correct" && (
           <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-game-correct/20">
-            <span className="text-4xl sm:text-5xl">✅</span>
+            <span className="text-5xl">✅</span>
           </div>
         )}
         {feedback === "wrong" && (
           <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-game-wrong/20">
-            <span className="text-4xl sm:text-5xl">❌</span>
+            <span className="text-5xl">❌</span>
           </div>
         )}
       </div>
@@ -317,7 +316,7 @@ const ShadowGame: React.FC = () => {
       {/* Answer text */}
       {feedback && (
         <div
-          className={`mb-3 sm:mb-4 animate-bounce-in text-center text-lg sm:text-xl font-bold ${
+          className={`mb-4 animate-bounce-in text-center text-xl font-bold ${
             feedback === "correct" ? "text-game-correct" : "text-game-wrong"
           }`}
         >
@@ -325,7 +324,7 @@ const ShadowGame: React.FC = () => {
             ? `${t.ui.correctPrefix} ${shadowName}! ${shadowEmoji}`
             : `${t.ui.wrongPrefix} ${shadowName}! ${shadowEmoji}`}
           {feedback === "correct" && funFact && (
-            <p className="mt-1 text-xs sm:text-sm font-medium text-muted-foreground">
+            <p className="mt-2 text-sm font-medium text-muted-foreground">
               {t.ui.funFactPrefix} {funFact}
             </p>
           )}
@@ -333,7 +332,7 @@ const ShadowGame: React.FC = () => {
       )}
 
       {/* Options */}
-      <div className="grid w-full max-w-md grid-cols-3 gap-2 sm:gap-4">
+      <div className="grid w-full max-w-md grid-cols-3 gap-4">
         {round.options.map((id) => {
           const A = (components as Record<string, React.FC<any>>)[id as string];
           const isSelected = selectedId === id;
@@ -346,7 +345,7 @@ const ShadowGame: React.FC = () => {
               key={id as string}
               onClick={() => handleGuess(id)}
               disabled={!!feedback}
-              className={`group flex flex-col items-center gap-1 sm:gap-2 rounded-2xl bg-card p-2 sm:p-4 shadow-md transition-all duration-200 ${
+              className={`group flex flex-col items-center gap-2 rounded-2xl bg-card p-4 shadow-md transition-all duration-200 ${
                 !feedback
                   ? "hover:scale-105 hover:shadow-lg active:scale-95"
                   : ""
@@ -364,8 +363,8 @@ const ShadowGame: React.FC = () => {
                   : ""
               }`}
             >
-              <A className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24" />
-              <span className="text-xs sm:text-sm font-semibold text-foreground md:text-base">
+              <A className="h-20 w-20 md:h-24 md:w-24" />
+              <span className="text-sm font-semibold text-foreground md:text-base">
                 {getCreatureName(mode, id, t)}
               </span>
             </button>
