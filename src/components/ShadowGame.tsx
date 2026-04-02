@@ -248,9 +248,10 @@ const ShadowGame: React.FC = () => {
             setScore(0);
             setTotal(0);
           }}
-          className="rounded-lg bg-muted px-4 py-2 text-sm font-semibold text-muted-foreground transition-transform active:scale-95"
+          className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+          title={t.ui.backButton}
         >
-          {t.ui.backButton}
+          🏠
         </button>
         <div className="flex items-center gap-2">
           <button
