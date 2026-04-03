@@ -18,6 +18,7 @@ export interface Translations {
     languageLabel: string;
     pwaInstallMessage: string;
     pwaInstallButton: string;
+    pwaIosMessage: string;
   };
   animalNames: Record<AnimalId, string>;
   dinoNames: Record<DinoId, string>;
@@ -39,6 +40,7 @@ export const translations: Record<Locale, Translations> = {
       languageLabel: "Idioma",
       pwaInstallMessage: "Instala a app para jogar sem internet!",
       pwaInstallButton: "Instalar",
+      pwaIosMessage: "Toca em Partilhar ⬆ e depois \"Adicionar ao ecrã principal\"",
     },
     animalNames: {
       cat: "Gato", dog: "Cachorro", elephant: "Elefante", rabbit: "Coelho",
@@ -75,6 +77,7 @@ export const translations: Record<Locale, Translations> = {
       languageLabel: "Language",
       pwaInstallMessage: "Install the app to play offline!",
       pwaInstallButton: "Install",
+      pwaIosMessage: "Tap Share ⬆ then \"Add to Home Screen\"",
     },
     animalNames: {
       cat: "Cat", dog: "Dog", elephant: "Elephant", rabbit: "Rabbit",
@@ -111,6 +114,7 @@ export const translations: Record<Locale, Translations> = {
       languageLabel: "Idioma",
       pwaInstallMessage: "¡Instala la app para jugar sin internet!",
       pwaInstallButton: "Instalar",
+      pwaIosMessage: "Toca Compartir ⬆ y luego \"Añadir a pantalla de inicio\"",
     },
     animalNames: {
       cat: "Gato", dog: "Perro", elephant: "Elefante", rabbit: "Conejo",
@@ -147,6 +151,7 @@ export const translations: Record<Locale, Translations> = {
       languageLabel: "Langue",
       pwaInstallMessage: "Installe l'appli pour jouer sans internet !",
       pwaInstallButton: "Installer",
+      pwaIosMessage: "Appuie sur Partager ⬆ puis \"Sur l'écran d'accueil\"",
     },
     animalNames: {
       cat: "Chat", dog: "Chien", elephant: "Éléphant", rabbit: "Lapin",
@@ -183,6 +188,7 @@ export const translations: Record<Locale, Translations> = {
       languageLabel: "Lingua",
       pwaInstallMessage: "Installa l'app per giocare senza internet!",
       pwaInstallButton: "Installa",
+      pwaIosMessage: "Tocca Condividi ⬆ poi \"Aggiungi a Home\"",
     },
     animalNames: {
       cat: "Gatto", dog: "Cane", elephant: "Elefante", rabbit: "Coniglio",
@@ -219,6 +225,7 @@ export const translations: Record<Locale, Translations> = {
       languageLabel: "Sprache",
       pwaInstallMessage: "Installiere die App, um offline zu spielen!",
       pwaInstallButton: "Installieren",
+      pwaIosMessage: "Tippe auf Teilen ⬆ und dann \"Zum Home-Bildschirm\"",
     },
     animalNames: {
       cat: "Katze", dog: "Hund", elephant: "Elefant", rabbit: "Kaninchen",

@@ -5,13 +5,23 @@ interface BeforeInstallPromptEvent extends Event {
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
 }
 
+function detectIos() {
+  return (
+    /iphone|ipad|ipod/i.test(navigator.userAgent) ||
+    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1)
+  );
+}
+
 export function usePwaInstall() {
   const [promptEvent, setPromptEvent] = useState<BeforeInstallPromptEvent | null>(null);
+  const [iosDismissed, setIosDismissed] = useState(false);
 
   const isStandalone =
     window.matchMedia("(display-mode: standalone)").matches ||
     window.matchMedia("(display-mode: fullscreen)").matches ||
     (navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+  const isIos = detectIos();
 
   useEffect(() => {
     if (isStandalone) return;
@@ -33,6 +43,13 @@ export function usePwaInstall() {
   };
 
   const dismiss = () => setPromptEvent(null);
+  const dismissIos = () => setIosDismissed(true);
 
-  return { canInstall: !isStandalone && !!promptEvent, install, dismiss };
+  return {
+    canInstall: !isStandalone && !!promptEvent,
+    install,
+    dismiss,
+    showIosBanner: isIos && !isStandalone && !iosDismissed,
+    dismissIos,
+  };
 }
