@@ -1,11 +1,18 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import fs from "fs";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
+// On Windows, K: may be a junction to a C: path. fs.realpathSync.native resolves
+// the real path, which Vite uses internally. We must set root to the same resolved
+// path so that relative paths are computed consistently.
+const projectRoot = fs.realpathSync.native(path.resolve(__dirname));
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  root: projectRoot,
   server: {
     host: "::",
     port: 8080,
@@ -43,7 +50,7 @@ export default defineConfig(({ mode }) => ({
   ].filter(Boolean),
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.join(projectRoot, "src"),
     },
   },
 }));

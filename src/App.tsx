@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { I18nProvider } from "@/i18n";
+import PwaInstallBanner from "./components/PwaInstallBanner.tsx";
 import Index from "./pages/Index.tsx";
 import NotFound from "./pages/NotFound.tsx";
 
@@ -15,6 +16,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
+        <PwaInstallBanner />
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />

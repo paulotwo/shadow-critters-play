@@ -16,6 +16,8 @@ export interface Translations {
     wrongPrefix: string;
     funFactPrefix: string;
     languageLabel: string;
+    pwaInstallMessage: string;
+    pwaInstallButton: string;
   };
   animalNames: Record<AnimalId, string>;
   dinoNames: Record<DinoId, string>;
@@ -35,6 +37,8 @@ export const translations: Record<Locale, Translations> = {
       wrongPrefix: "Ops! Era o",
       funFactPrefix: "💡",
       languageLabel: "Idioma",
+      pwaInstallMessage: "Instala a app para jogar sem internet!",
+      pwaInstallButton: "Instalar",
     },
     animalNames: {
       cat: "Gato", dog: "Cachorro", elephant: "Elefante", rabbit: "Coelho",
@@ -69,6 +73,8 @@ export const translations: Record<Locale, Translations> = {
       wrongPrefix: "Oops! It was the",
       funFactPrefix: "💡",
       languageLabel: "Language",
+      pwaInstallMessage: "Install the app to play offline!",
+      pwaInstallButton: "Install",
     },
     animalNames: {
       cat: "Cat", dog: "Dog", elephant: "Elephant", rabbit: "Rabbit",
@@ -103,6 +109,8 @@ export const translations: Record<Locale, Translations> = {
       wrongPrefix: "¡Ups! Era el",
       funFactPrefix: "💡",
       languageLabel: "Idioma",
+      pwaInstallMessage: "¡Instala la app para jugar sin internet!",
+      pwaInstallButton: "Instalar",
     },
     animalNames: {
       cat: "Gato", dog: "Perro", elephant: "Elefante", rabbit: "Conejo",
@@ -137,6 +145,8 @@ export const translations: Record<Locale, Translations> = {
       wrongPrefix: "Oups ! C'était le",
       funFactPrefix: "💡",
       languageLabel: "Langue",
+      pwaInstallMessage: "Installe l'appli pour jouer sans internet !",
+      pwaInstallButton: "Installer",
     },
     animalNames: {
       cat: "Chat", dog: "Chien", elephant: "Éléphant", rabbit: "Lapin",
@@ -171,6 +181,8 @@ export const translations: Record<Locale, Translations> = {
       wrongPrefix: "Ops! Era il",
       funFactPrefix: "💡",
       languageLabel: "Lingua",
+      pwaInstallMessage: "Installa l'app per giocare senza internet!",
+      pwaInstallButton: "Installa",
     },
     animalNames: {
       cat: "Gatto", dog: "Cane", elephant: "Elefante", rabbit: "Coniglio",
@@ -205,6 +217,8 @@ export const translations: Record<Locale, Translations> = {
       wrongPrefix: "Ups! Es war der/die/das",
       funFactPrefix: "💡",
       languageLabel: "Sprache",
+      pwaInstallMessage: "Installiere die App, um offline zu spielen!",
+      pwaInstallButton: "Installieren",
     },
     animalNames: {
       cat: "Katze", dog: "Hund", elephant: "Elefant", rabbit: "Kaninchen",
