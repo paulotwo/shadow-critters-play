@@ -33,7 +33,9 @@ export default defineConfig(({ mode }) => ({
       manifest: {
         name: "Jogo das Sombras",
         short_name: "Sombras",
-        description: "Jogo educativo de sombras de animais para crianças",
+        description: "Jogo educativo gratuito: adivinhe animais e dinossauros pela sombra! 50+ criaturas em 6 idiomas.",
+        lang: "pt-BR",
+        categories: ["games", "education", "kids"],
         theme_color: "#1a1a2e",
         background_color: "#1a1a2e",
         display: "fullscreen",
