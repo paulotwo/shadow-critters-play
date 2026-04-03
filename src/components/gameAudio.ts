@@ -38,6 +38,29 @@ export function playWrongSound() {
   }
 }
 
+// ---------- Speech API voice cache ----------
+
+let cachedVoices: SpeechSynthesisVoice[] = [];
+
+function loadVoices() {
+  if (!("speechSynthesis" in window)) return;
+  const v = window.speechSynthesis.getVoices();
+  if (v.length > 0) cachedVoices = v;
+}
+
+/** Call on the home screen to pre-load voices before the first speech request. */
+export function prewarmSpeech() {
+  if (!("speechSynthesis" in window)) return;
+  loadVoices();
+  if (cachedVoices.length === 0) {
+    window.speechSynthesis.addEventListener("voiceschanged", loadVoices, { once: true });
+  }
+  // Speak a silent utterance to unlock the audio context on mobile
+  const silent = new SpeechSynthesisUtterance(" ");
+  silent.volume = 0;
+  window.speechSynthesis.speak(silent);
+}
+
 // Speak text using Web Speech API – returns a promise that resolves when speech ends
 export function speakText(text: string, lang: string = "pt-BR"): Promise<void> {
   return new Promise((resolve) => {
@@ -48,7 +71,7 @@ export function speakText(text: string, lang: string = "pt-BR"): Promise<void> {
       utterance.lang = lang;
       utterance.rate = 0.9;
       utterance.pitch = 1.2;
-      const voices = window.speechSynthesis.getVoices();
+      const voices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
       const langPrefix = lang.split("-")[0];
       const voice = voices.find((v) => v.lang.startsWith(langPrefix));
       if (voice) utterance.voice = voice;

@@ -11,7 +11,7 @@ import {
 } from "./dinosaurs";
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
-import { playCorrectSound, playWrongSound, speakText, enterFullscreen, startBackgroundMusic, stopBackgroundMusic, switchMelody } from "./gameAudio";
+import { playCorrectSound, playWrongSound, speakText, prewarmSpeech, enterFullscreen, startBackgroundMusic, stopBackgroundMusic, switchMelody } from "./gameAudio";
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
@@ -159,6 +159,10 @@ const ShadowGame: React.FC = () => {
     },
     [feedback, round.shadow, nextRound, clearHintTimer, mode, locale, t, speechLang, funFactsOn]
   );
+
+  useEffect(() => {
+    if (showIntro) prewarmSpeech();
+  }, [showIntro]);
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
