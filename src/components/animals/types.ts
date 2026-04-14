@@ -8,8 +8,8 @@ export interface AnimalProps {
 export const shadowFill = "#2d2d3f";
 
 export type AnimalId =
-  | "cat" | "dog" | "elephant" | "rabbit" | "bird" | "fish"
+  | "cat" | "dog" | "elephant" | "rabbit" | "bird"
   | "lion" | "turtle" | "butterfly" | "frog" | "horse" | "owl"
-  | "penguin" | "monkey" | "giraffe" | "bear" | "dolphin" | "snake"
-  | "bee" | "pig" | "panda" | "koala" | "zebra" | "shark"
-  | "whale" | "crocodile" | "fox" | "duck" | "octopus" | "tiger";
+  | "penguin" | "monkey" | "giraffe" | "bear" | "snake"
+  | "bee" | "pig" | "panda" | "koala" | "zebra"
+  | "crocodile" | "fox" | "duck" | "tiger";
