@@ -262,16 +262,16 @@ const ShadowGame: React.FC = () => {
               {t.ui.animalsButton}
             </button>
             <button
-              onClick={() => handleStartGame("dinos")}
-              className="w-56 rounded-full bg-game-correct px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
-            >
-              {t.ui.dinosButton}
-            </button>
-            <button
               onClick={() => handleStartGame("aquatics")}
               className="w-56 rounded-full bg-[hsl(200,80%,50%)] px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
             >
               {t.ui.aquaticsButton}
+            </button>
+            <button
+              onClick={() => handleStartGame("dinos")}
+              className="w-56 rounded-full bg-game-correct px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
+            >
+              {t.ui.dinosButton}
             </button>
           </div>
         </div>
