@@ -9,21 +9,27 @@ import {
   dinoEmojis,
   type DinoId,
 } from "./dinosaurs";
+import {
+  aquaticComponents,
+  aquaticEmojis,
+  type AquaticId,
+} from "./aquatics";
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
+import { getRandomAquaticFunFact } from "./aquaticFunFacts";
 import { playCorrectSound, playWrongSound, speakText, prewarmSpeech, enterFullscreen, startBackgroundMusic, stopBackgroundMusic, switchMelody } from "./gameAudio";
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
 
-type GameMode = "animals" | "dinos";
-type CreatureId = AnimalId | DinoId;
+type GameMode = "animals" | "dinos" | "aquatics";
+type CreatureId = AnimalId | DinoId | AquaticId;
 
 const ALL_ANIMALS: AnimalId[] = [
-  "cat", "dog", "elephant", "rabbit", "bird", "fish",
+  "cat", "dog", "elephant", "rabbit", "bird",
   "lion", "turtle", "butterfly", "frog", "horse", "owl",
-  "penguin", "monkey", "giraffe", "bear", "dolphin", "snake", "bee", "pig",
-  "panda", "koala", "zebra", "shark", "whale", "crocodile", "fox", "duck", "octopus", "tiger",
+  "penguin", "monkey", "giraffe", "bear", "snake", "bee", "pig",
+  "panda", "koala", "zebra", "crocodile", "fox", "duck", "tiger",
 ];
 
 const ALL_DINOS: DinoId[] = [
@@ -31,6 +37,13 @@ const ALL_DINOS: DinoId[] = [
   "pteranodon", "ankylosaurus", "spinosaurus", "parasaurolophus", "diplodocus",
   "pachycephalosaurus", "iguanodon", "compsognathus", "carnotaurus", "dilophosaurus",
   "apatosaurus", "plesiosaurus", "mosasaurus", "dimetrodon", "archaeopteryx",
+];
+
+const ALL_AQUATICS: AquaticId[] = [
+  "whale", "dolphin", "shark", "octopus", "fish",
+  "seahorse", "jellyfish", "stingray", "seal", "crab",
+  "lobster", "starfish", "narwhal", "orca", "clownfish",
+  "squid", "walrus", "sea_turtle", "swordfish", "manatee",
 ];
 
 function shuffle<T>(arr: T[]): T[] {
@@ -54,26 +67,40 @@ function pickRound<T>(pool: T[], recentList: T[]): { shadow: T; options: T[] } {
 }
 
 function getComponents(mode: GameMode) {
-  return mode === "animals" ? animalComponents : dinoComponents;
+  if (mode === "animals") return animalComponents;
+  if (mode === "dinos") return dinoComponents;
+  return aquaticComponents;
 }
 function getEmojis(mode: GameMode) {
-  return mode === "animals" ? animalEmojis : dinoEmojis;
+  if (mode === "animals") return animalEmojis;
+  if (mode === "dinos") return dinoEmojis;
+  return aquaticEmojis;
 }
 function getPool(mode: GameMode): CreatureId[] {
-  return mode === "animals" ? ALL_ANIMALS : ALL_DINOS;
+  if (mode === "animals") return ALL_ANIMALS;
+  if (mode === "dinos") return ALL_DINOS;
+  return ALL_AQUATICS;
 }
 function getFunFact(mode: GameMode, id: CreatureId, locale: Locale): string {
-  return mode === "animals"
-    ? getRandomFunFact(id as AnimalId, locale)
-    : getRandomDinoFunFact(id as DinoId, locale);
+  if (mode === "animals") return getRandomFunFact(id as AnimalId, locale);
+  if (mode === "dinos") return getRandomDinoFunFact(id as DinoId, locale);
+  return getRandomAquaticFunFact(id as AquaticId, locale);
 }
 function getCreatureName(mode: GameMode, id: CreatureId, t: ReturnType<typeof useI18n>["t"]): string {
-  return mode === "animals"
-    ? t.animalNames[id as AnimalId]
-    : t.dinoNames[id as DinoId];
+  if (mode === "animals") return t.animalNames[id as AnimalId];
+  if (mode === "dinos") return t.dinoNames[id as DinoId];
+  return t.aquaticNames[id as AquaticId];
 }
-
-// Language selector is now a separate component
+function getQuestion(mode: GameMode, t: ReturnType<typeof useI18n>["t"]): string {
+  if (mode === "animals") return t.ui.questionAnimal;
+  if (mode === "dinos") return t.ui.questionDino;
+  return t.ui.questionAquatic;
+}
+function getModeEmoji(mode: GameMode): string {
+  if (mode === "animals") return "🐾";
+  if (mode === "dinos") return "🦖";
+  return "🐠";
+}
 
 const ShadowGame: React.FC = () => {
   const { locale, setLocale, t, speechLang } = useI18n();
@@ -184,7 +211,7 @@ const ShadowGame: React.FC = () => {
     setShowIntro(false);
     enterFullscreen();
     startBackgroundMusic();
-    const question = selectedMode === "animals" ? t.ui.questionAnimal : t.ui.questionDino;
+    const question = getQuestion(selectedMode, t);
     speakText(question, speechLang);
   };
 
@@ -202,7 +229,7 @@ const ShadowGame: React.FC = () => {
             {t.ui.gameSubtitle}
           </p>
           <div className="mb-8 flex flex-wrap justify-center gap-2 max-w-sm">
-            {ALL_ANIMALS.slice(0, 4).map((id, i) => {
+            {ALL_ANIMALS.slice(0, 3).map((id, i) => {
               const A = animalComponents[id];
               return (
                 <div key={id} className="animate-float" style={{ animationDelay: `${i * 0.2}s` }}>
@@ -210,11 +237,19 @@ const ShadowGame: React.FC = () => {
                 </div>
               );
             })}
-            {ALL_DINOS.slice(0, 4).map((id, i) => {
+            {ALL_DINOS.slice(0, 3).map((id, i) => {
               const D = dinoComponents[id];
               return (
-                <div key={id} className="animate-float" style={{ animationDelay: `${(i + 4) * 0.2}s` }}>
+                <div key={id} className="animate-float" style={{ animationDelay: `${(i + 3) * 0.2}s` }}>
                   <D className="h-10 w-10 md:h-12 md:w-12" />
+                </div>
+              );
+            })}
+            {ALL_AQUATICS.slice(0, 3).map((id, i) => {
+              const Q = aquaticComponents[id];
+              return (
+                <div key={id} className="animate-float" style={{ animationDelay: `${(i + 6) * 0.2}s` }}>
+                  <Q className="h-10 w-10 md:h-12 md:w-12" />
                 </div>
               );
             })}
@@ -231,6 +266,12 @@ const ShadowGame: React.FC = () => {
               className="w-56 rounded-full bg-game-correct px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
             >
               {t.ui.dinosButton}
+            </button>
+            <button
+              onClick={() => handleStartGame("aquatics")}
+              className="w-56 rounded-full bg-[hsl(200,80%,50%)] px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
+            >
+              {t.ui.aquaticsButton}
             </button>
           </div>
         </div>
@@ -282,7 +323,7 @@ const ShadowGame: React.FC = () => {
           </button>
           {langButton}
           <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
-            <span className="text-lg">{mode === "animals" ? "🐾" : "🦖"}</span>
+            <span className="text-lg">{getModeEmoji(mode)}</span>
             <span className="text-xl font-bold text-foreground tabular-nums">
               {score}/{total}
             </span>
@@ -292,7 +333,7 @@ const ShadowGame: React.FC = () => {
 
       {/* Shadow display */}
       <div className="mb-2 text-center text-lg font-semibold text-muted-foreground">
-        {mode === "animals" ? t.ui.questionAnimal : t.ui.questionDino}
+        {getQuestion(mode, t)}
       </div>
       <div
         className={`relative mb-8 flex items-center justify-center rounded-3xl bg-card p-8 shadow-xl transition-all duration-300 ${
