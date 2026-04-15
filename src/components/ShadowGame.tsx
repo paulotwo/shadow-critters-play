@@ -112,6 +112,7 @@ function getModeEmoji(mode: GameMode): string {
 const ShadowGame: React.FC = () => {
   const { locale, setLocale, t, speechLang } = useI18n();
   const [mode, setMode] = useState<GameMode>("animals");
+  const [variant, setVariant] = useState<GameVariant>("shadow");
   const recentShadowsRef = useRef<CreatureId[]>([]);
   const [round, setRound] = useState(() => pickRound(getPool("animals"), []));
   const [score, setScore] = useState(0);
