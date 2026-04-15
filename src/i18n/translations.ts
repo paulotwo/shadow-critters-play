@@ -15,9 +15,6 @@ export interface Translations {
     questionAnimal: string;
     questionDino: string;
     questionAquatic: string;
-    questionRevealAnimal: string;
-    questionRevealDino: string;
-    questionRevealAquatic: string;
     correctPrefix: string;
     wrongPrefix: string;
     funFactPrefix: string;
@@ -25,8 +22,6 @@ export interface Translations {
     pwaInstallMessage: string;
     pwaInstallButton: string;
     pwaIosMessage: string;
-    modeShadow: string;
-    modeReveal: string;
   };
   animalNames: Record<AnimalId, string>;
   dinoNames: Record<DinoId, string>;
@@ -45,15 +40,10 @@ export const translations: Record<Locale, Translations> = {
       questionAnimal: "Qual é este animal?",
       questionDino: "Qual é este dinossauro?",
       questionAquatic: "Qual é este animal aquático?",
-      questionRevealAnimal: "Quem sou eu? 🧩",
-      questionRevealDino: "Quem sou eu? 🧩",
-      questionRevealAquatic: "Quem sou eu? 🧩",
       correctPrefix: "Isso! É o",
       wrongPrefix: "Ops! Era o",
       funFactPrefix: "💡",
       languageLabel: "Idioma",
-      modeShadow: "🌑 Sombra",
-      modeReveal: "🧩 Quem sou eu?",
       pwaInstallMessage: "Instala a app para jogar sem internet!",
       pwaInstallButton: "Instalar",
       pwaIosMessage: "Toca em Partilhar ⬆ e depois \"Adicionar ao ecrã principal\"",
@@ -95,15 +85,10 @@ export const translations: Record<Locale, Translations> = {
       questionAnimal: "Which animal is this?",
       questionDino: "Which dinosaur is this?",
       questionAquatic: "Which aquatic animal is this?",
-      questionRevealAnimal: "Who am I? 🧩",
-      questionRevealDino: "Who am I? 🧩",
-      questionRevealAquatic: "Who am I? 🧩",
       correctPrefix: "Yes! It's the",
       wrongPrefix: "Oops! It was the",
       funFactPrefix: "💡",
       languageLabel: "Language",
-      modeShadow: "🌑 Shadow",
-      modeReveal: "🧩 Who am I?",
       pwaInstallMessage: "Install the app to play offline!",
       pwaInstallButton: "Install",
       pwaIosMessage: "Tap Share ⬆ then \"Add to Home Screen\"",
@@ -145,15 +130,10 @@ export const translations: Record<Locale, Translations> = {
       questionAnimal: "¿Qué animal es este?",
       questionDino: "¿Qué dinosaurio es este?",
       questionAquatic: "¿Qué animal acuático es este?",
-      questionRevealAnimal: "¿Quién soy? 🧩",
-      questionRevealDino: "¿Quién soy? 🧩",
-      questionRevealAquatic: "¿Quién soy? 🧩",
       correctPrefix: "¡Sí! Es el",
       wrongPrefix: "¡Ups! Era el",
       funFactPrefix: "💡",
       languageLabel: "Idioma",
-      modeShadow: "🌑 Sombra",
-      modeReveal: "🧩 ¿Quién soy?",
       pwaInstallMessage: "¡Instala la app para jugar sin internet!",
       pwaInstallButton: "Instalar",
       pwaIosMessage: "Toca Compartir ⬆ y luego \"Añadir a pantalla de inicio\"",
@@ -195,15 +175,10 @@ export const translations: Record<Locale, Translations> = {
       questionAnimal: "Quel est cet animal ?",
       questionDino: "Quel est ce dinosaure ?",
       questionAquatic: "Quel est cet animal aquatique ?",
-      questionRevealAnimal: "Qui suis-je ? 🧩",
-      questionRevealDino: "Qui suis-je ? 🧩",
-      questionRevealAquatic: "Qui suis-je ? 🧩",
       correctPrefix: "Oui ! C'est le",
       wrongPrefix: "Oups ! C'était le",
       funFactPrefix: "💡",
       languageLabel: "Langue",
-      modeShadow: "🌑 Ombre",
-      modeReveal: "🧩 Qui suis-je ?",
       pwaInstallMessage: "Installe l'appli pour jouer sans internet !",
       pwaInstallButton: "Installer",
       pwaIosMessage: "Appuie sur Partager ⬆ puis \"Sur l'écran d'accueil\"",
@@ -245,15 +220,10 @@ export const translations: Record<Locale, Translations> = {
       questionAnimal: "Qual è questo animale?",
       questionDino: "Qual è questo dinosauro?",
       questionAquatic: "Qual è questo animale acquatico?",
-      questionRevealAnimal: "Chi sono? 🧩",
-      questionRevealDino: "Chi sono? 🧩",
-      questionRevealAquatic: "Chi sono? 🧩",
       correctPrefix: "Sì! È il",
       wrongPrefix: "Ops! Era il",
       funFactPrefix: "💡",
       languageLabel: "Lingua",
-      modeShadow: "🌑 Ombra",
-      modeReveal: "🧩 Chi sono?",
       pwaInstallMessage: "Installa l'app per giocare senza internet!",
       pwaInstallButton: "Installa",
       pwaIosMessage: "Tocca Condividi ⬆ poi \"Aggiungi a Home\"",
@@ -295,15 +265,10 @@ export const translations: Record<Locale, Translations> = {
       questionAnimal: "Welches Tier ist das?",
       questionDino: "Welcher Dinosaurier ist das?",
       questionAquatic: "Welches Wassertier ist das?",
-      questionRevealAnimal: "Wer bin ich? 🧩",
-      questionRevealDino: "Wer bin ich? 🧩",
-      questionRevealAquatic: "Wer bin ich? 🧩",
       correctPrefix: "Ja! Es ist der/die/das",
       wrongPrefix: "Ups! Es war der/die/das",
       funFactPrefix: "💡",
       languageLabel: "Sprache",
-      modeShadow: "🌑 Schatten",
-      modeReveal: "🧩 Wer bin ich?",
       pwaInstallMessage: "Installiere die App, um offline zu spielen!",
       pwaInstallButton: "Installieren",
       pwaIosMessage: "Tippe auf Teilen ⬆ und dann \"Zum Home-Bildschirm\"",

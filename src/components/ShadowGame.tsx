@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
-import RevealOverlay from "./RevealOverlay";
 import {
   animalComponents,
   animalEmojis,
@@ -24,7 +23,6 @@ import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
 
 type GameMode = "animals" | "dinos" | "aquatics";
-type GameVariant = "shadow" | "reveal";
 type CreatureId = AnimalId | DinoId | AquaticId;
 
 const ALL_ANIMALS: AnimalId[] = [
@@ -93,12 +91,7 @@ function getCreatureName(mode: GameMode, id: CreatureId, t: ReturnType<typeof us
   if (mode === "dinos") return t.dinoNames[id as DinoId];
   return t.aquaticNames[id as AquaticId];
 }
-function getQuestion(mode: GameMode, variant: GameVariant, t: ReturnType<typeof useI18n>["t"]): string {
-  if (variant === "reveal") {
-    if (mode === "animals") return t.ui.questionRevealAnimal;
-    if (mode === "dinos") return t.ui.questionRevealDino;
-    return t.ui.questionRevealAquatic;
-  }
+function getQuestion(mode: GameMode, t: ReturnType<typeof useI18n>["t"]): string {
   if (mode === "animals") return t.ui.questionAnimal;
   if (mode === "dinos") return t.ui.questionDino;
   return t.ui.questionAquatic;
@@ -112,7 +105,6 @@ function getModeEmoji(mode: GameMode): string {
 const ShadowGame: React.FC = () => {
   const { locale, setLocale, t, speechLang } = useI18n();
   const [mode, setMode] = useState<GameMode>("animals");
-  const [variant, setVariant] = useState<GameVariant>("shadow");
   const recentShadowsRef = useRef<CreatureId[]>([]);
   const [round, setRound] = useState(() => pickRound(getPool("animals"), []));
   const [score, setScore] = useState(0);
@@ -219,7 +211,7 @@ const ShadowGame: React.FC = () => {
     setShowIntro(false);
     enterFullscreen();
     startBackgroundMusic();
-    const question = getQuestion(selectedMode, variant, t);
+    const question = getQuestion(selectedMode, t);
     speakText(question, speechLang);
   };
 
@@ -308,15 +300,6 @@ const ShadowGame: React.FC = () => {
         </button>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => setVariant((v) => v === "shadow" ? "reveal" : "shadow")}
-            className={`rounded-lg px-3 py-2 text-sm font-semibold transition-transform active:scale-95 ${
-              variant === "reveal" ? "bg-primary text-primary-foreground" : "bg-muted"
-            }`}
-            title={variant === "shadow" ? t.ui.modeReveal : t.ui.modeShadow}
-          >
-            {variant === "shadow" ? "🌑" : "🧩"}
-          </button>
-          <button
             onClick={() => {
               if (musicOn) {
                 stopBackgroundMusic();
@@ -350,7 +333,7 @@ const ShadowGame: React.FC = () => {
 
       {/* Shadow display */}
       <div className="mb-2 text-center text-lg font-semibold text-muted-foreground">
-        {getQuestion(mode, variant, t)}
+        {getQuestion(mode, t)}
       </div>
       <div
         className={`relative mb-8 flex items-center justify-center rounded-3xl bg-card p-8 shadow-xl transition-all duration-300 ${
@@ -362,13 +345,7 @@ const ShadowGame: React.FC = () => {
         }`}
         style={{ width: 220, height: 220 }}
       >
-        <ShadowCreature className="h-40 w-40" isShadow={variant === "shadow"} />
-        {variant === "reveal" && (
-          <RevealOverlay
-            roundKey={round.shadow as string}
-            paused={!!feedback}
-          />
-        )}
+        <ShadowCreature className="h-40 w-40" isShadow />
 
         {feedback === "correct" && (
           <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-game-correct/20">
