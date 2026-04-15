@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import RevealOverlay from "./RevealOverlay";
 import {
   animalComponents,
   animalEmojis,
