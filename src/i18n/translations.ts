@@ -15,6 +15,9 @@ export interface Translations {
     questionAnimal: string;
     questionDino: string;
     questionAquatic: string;
+    questionRevealAnimal: string;
+    questionRevealDino: string;
+    questionRevealAquatic: string;
     correctPrefix: string;
     wrongPrefix: string;
     funFactPrefix: string;
@@ -22,6 +25,8 @@ export interface Translations {
     pwaInstallMessage: string;
     pwaInstallButton: string;
     pwaIosMessage: string;
+    modeShadow: string;
+    modeReveal: string;
   };
   animalNames: Record<AnimalId, string>;
   dinoNames: Record<DinoId, string>;
