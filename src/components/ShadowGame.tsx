@@ -219,7 +219,7 @@ const ShadowGame: React.FC = () => {
     setShowIntro(false);
     enterFullscreen();
     startBackgroundMusic();
-    const question = getQuestion(selectedMode, t);
+    const question = getQuestion(selectedMode, variant, t);
     speakText(question, speechLang);
   };
 
@@ -341,7 +341,7 @@ const ShadowGame: React.FC = () => {
 
       {/* Shadow display */}
       <div className="mb-2 text-center text-lg font-semibold text-muted-foreground">
-        {getQuestion(mode, t)}
+        {getQuestion(mode, variant, t)}
       </div>
       <div
         className={`relative mb-8 flex items-center justify-center rounded-3xl bg-card p-8 shadow-xl transition-all duration-300 ${
