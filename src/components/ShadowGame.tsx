@@ -308,6 +308,15 @@ const ShadowGame: React.FC = () => {
         </button>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setVariant((v) => v === "shadow" ? "reveal" : "shadow")}
+            className={`rounded-lg px-3 py-2 text-sm font-semibold transition-transform active:scale-95 ${
+              variant === "reveal" ? "bg-primary text-primary-foreground" : "bg-muted"
+            }`}
+            title={variant === "shadow" ? t.ui.modeReveal : t.ui.modeShadow}
+          >
+            {variant === "shadow" ? "🌑" : "🧩"}
+          </button>
+          <button
             onClick={() => {
               if (musicOn) {
                 stopBackgroundMusic();
@@ -353,7 +362,13 @@ const ShadowGame: React.FC = () => {
         }`}
         style={{ width: 220, height: 220 }}
       >
-        <ShadowCreature className="h-40 w-40" isShadow />
+        <ShadowCreature className="h-40 w-40" isShadow={variant === "shadow"} />
+        {variant === "reveal" && (
+          <RevealOverlay
+            roundKey={round.shadow as string}
+            paused={!!feedback}
+          />
+        )}
 
         {feedback === "correct" && (
           <div className="absolute inset-0 flex items-center justify-center rounded-3xl bg-game-correct/20">
