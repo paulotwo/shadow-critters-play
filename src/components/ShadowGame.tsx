@@ -24,6 +24,7 @@ import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
 
 type GameMode = "animals" | "dinos" | "aquatics";
+type GameVariant = "shadow" | "reveal";
 type CreatureId = AnimalId | DinoId | AquaticId;
 
 const ALL_ANIMALS: AnimalId[] = [
@@ -92,7 +93,12 @@ function getCreatureName(mode: GameMode, id: CreatureId, t: ReturnType<typeof us
   if (mode === "dinos") return t.dinoNames[id as DinoId];
   return t.aquaticNames[id as AquaticId];
 }
-function getQuestion(mode: GameMode, t: ReturnType<typeof useI18n>["t"]): string {
+function getQuestion(mode: GameMode, variant: GameVariant, t: ReturnType<typeof useI18n>["t"]): string {
+  if (variant === "reveal") {
+    if (mode === "animals") return t.ui.questionRevealAnimal;
+    if (mode === "dinos") return t.ui.questionRevealDino;
+    return t.ui.questionRevealAquatic;
+  }
   if (mode === "animals") return t.ui.questionAnimal;
   if (mode === "dinos") return t.ui.questionDino;
   return t.ui.questionAquatic;
