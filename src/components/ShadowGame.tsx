@@ -21,6 +21,7 @@ import { playCorrectSound, playWrongSound, speakText, prewarmSpeech, enterFullsc
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
+import { Share2 } from "lucide-react";
 
 type GameMode = "animals" | "dinos" | "aquatics";
 type CreatureId = AnimalId | DinoId | AquaticId;
@@ -215,12 +216,34 @@ const ShadowGame: React.FC = () => {
     speakText(question, speechLang);
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: t.ui.gameTitle.replace(/[^\w\s]/g, "").trim(),
+      text: t.ui.shareText,
+      url: window.location.href,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); } catch { /* user cancelled */ }
+    } else {
+      await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
+    }
+  };
+
   const langButton = <LanguageSelector />;
 
   if (showIntro) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
-        <div className="absolute top-4 right-4">{langButton}</div>
+        <div className="absolute top-4 right-4 flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="rounded-xl bg-card/80 backdrop-blur px-3 py-2 text-lg transition-transform hover:scale-105 active:scale-95 shadow"
+            title={t.ui.shareButton}
+          >
+            <Share2 size={20} className="text-foreground" />
+          </button>
+          {langButton}
+        </div>
         <div className="animate-bounce-in text-center">
           <h1 className="mb-2 text-5xl font-bold text-primary md:text-6xl" style={{ lineHeight: 1.1 }}>
             {t.ui.gameTitle}
@@ -299,6 +322,13 @@ const ShadowGame: React.FC = () => {
           🏠
         </button>
         <div className="flex items-center gap-2">
+          <button
+            onClick={handleShare}
+            className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            title={t.ui.shareButton}
+          >
+            <Share2 size={18} className="text-foreground" />
+          </button>
           <button
             onClick={() => {
               if (musicOn) {

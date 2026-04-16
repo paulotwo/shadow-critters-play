@@ -22,6 +22,8 @@ export interface Translations {
     pwaInstallMessage: string;
     pwaInstallButton: string;
     pwaIosMessage: string;
+    shareButton: string;
+    shareText: string;
   };
   animalNames: Record<AnimalId, string>;
   dinoNames: Record<DinoId, string>;
@@ -47,6 +49,8 @@ export const translations: Record<Locale, Translations> = {
       pwaInstallMessage: "Instala a app para jogar sem internet!",
       pwaInstallButton: "Instalar",
       pwaIosMessage: "Toca em Partilhar ⬆ e depois \"Adicionar ao ecrã principal\"",
+      shareButton: "Compartilhar",
+      shareText: "Venha jogar o Jogo de Sombras! Descubra animais, dinossauros e aquáticos! 🌙🐾",
     },
     animalNames: {
       cat: "Gato", dog: "Cachorro", elephant: "Elefante", rabbit: "Coelho",
@@ -92,6 +96,8 @@ export const translations: Record<Locale, Translations> = {
       pwaInstallMessage: "Install the app to play offline!",
       pwaInstallButton: "Install",
       pwaIosMessage: "Tap Share ⬆ then \"Add to Home Screen\"",
+      shareButton: "Share",
+      shareText: "Come play the Shadow Game! Discover animals, dinosaurs and aquatics! 🌙🐾",
     },
     animalNames: {
       cat: "Cat", dog: "Dog", elephant: "Elephant", rabbit: "Rabbit",
@@ -137,6 +143,8 @@ export const translations: Record<Locale, Translations> = {
       pwaInstallMessage: "¡Instala la app para jugar sin internet!",
       pwaInstallButton: "Instalar",
       pwaIosMessage: "Toca Compartir ⬆ y luego \"Añadir a pantalla de inicio\"",
+      shareButton: "Compartir",
+      shareText: "¡Ven a jugar al Juego de Sombras! ¡Descubre animales, dinosaurios y acuáticos! 🌙🐾",
     },
     animalNames: {
       cat: "Gato", dog: "Perro", elephant: "Elefante", rabbit: "Conejo",
@@ -182,6 +190,8 @@ export const translations: Record<Locale, Translations> = {
       pwaInstallMessage: "Installe l'appli pour jouer sans internet !",
       pwaInstallButton: "Installer",
       pwaIosMessage: "Appuie sur Partager ⬆ puis \"Sur l'écran d'accueil\"",
+      shareButton: "Partager",
+      shareText: "Viens jouer au Jeu d'Ombres ! Découvre animaux, dinosaures et aquatiques ! 🌙🐾",
     },
     animalNames: {
       cat: "Chat", dog: "Chien", elephant: "Éléphant", rabbit: "Lapin",
@@ -227,6 +237,8 @@ export const translations: Record<Locale, Translations> = {
       pwaInstallMessage: "Installa l'app per giocare senza internet!",
       pwaInstallButton: "Installa",
       pwaIosMessage: "Tocca Condividi ⬆ poi \"Aggiungi a Home\"",
+      shareButton: "Condividi",
+      shareText: "Vieni a giocare al Gioco delle Ombre! Scopri animali, dinosauri e acquatici! 🌙🐾",
     },
     animalNames: {
       cat: "Gatto", dog: "Cane", elephant: "Elefante", rabbit: "Coniglio",
@@ -272,6 +284,8 @@ export const translations: Record<Locale, Translations> = {
       pwaInstallMessage: "Installiere die App, um offline zu spielen!",
       pwaInstallButton: "Installieren",
       pwaIosMessage: "Tippe auf Teilen ⬆ und dann \"Zum Home-Bildschirm\"",
+      shareButton: "Teilen",
+      shareText: "Komm und spiele das Schattenspiel! Entdecke Tiere, Dinosaurier und Wassertiere! 🌙🐾",
     },
     animalNames: {
       cat: "Katze", dog: "Hund", elephant: "Elefant", rabbit: "Kaninchen",
