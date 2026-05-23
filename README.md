@@ -2,6 +2,8 @@
 
 A children's educational shadow-guessing game. A silhouette appears on screen — can you identify the animal or dinosaur hiding in the shadows?
 
+Play at: **https://shadow-critters-play.ksepisteme.com.br/**
+
 ## How to Play
 
 1. Choose a game mode: **Animals** or **Dinosaurs**
@@ -23,27 +25,53 @@ If you take too long, the correct option will briefly pulse as a hint.
 ## Getting Started
 
 ```bash
-npm install
-npm run dev
+bun install
+bun run dev
 ```
+
+The dev server runs at `http://localhost:8080`.
 
 Build for production:
 
 ```bash
-npm run build
+bun run build
+```
+
+Preview the production build locally:
+
+```bash
+bun run preview
 ```
 
 Run tests:
 
 ```bash
-npm test
+bun test
 ```
+
+## Deploy
+
+The app is deployed to Cloudflare Workers as a static site. Make sure you are logged in first:
+
+```bash
+wrangler login
+```
+
+Then deploy:
+
+```bash
+bun run deploy
+```
+
+This runs `vite build` followed by `wrangler deploy`, publishing the contents of `dist/` as static assets.
 
 ## Tech Stack
 
 - [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - [Vite](https://vitejs.dev/) with PWA plugin
 - [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
+- [Cloudflare Workers](https://workers.cloudflare.com/) (static assets)
+- [Bun](https://bun.sh/) (package manager)
 - Web Audio API (sound effects + background music)
 - Web Speech API (text-to-speech)
 

@@ -2,7 +2,6 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import fs from "fs";
-import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
 // On Windows, K: may be a junction to a C: path. fs.realpathSync.native resolves
@@ -11,7 +10,7 @@ import { VitePWA } from "vite-plugin-pwa";
 const projectRoot = fs.realpathSync.native(path.resolve(__dirname));
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
   root: projectRoot,
   server: {
     host: "::",
@@ -22,7 +21,6 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react(),
-    mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt"],
