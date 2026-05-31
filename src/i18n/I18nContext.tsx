@@ -1,5 +1,22 @@
-import React, { createContext, useContext, useState, useCallback, useMemo } from "react";
+import React, { createContext, useContext, useState, useCallback, useMemo, useEffect } from "react";
 import { translations, type Locale, type Translations } from "./translations";
+
+const SITE_URL = "https://shadow-critters-play.lovable.app";
+
+function updatePreviewMeta(locale: Locale) {
+  if (typeof document === "undefined") return;
+  const url = `${SITE_URL}/og/preview-${locale}.png`;
+  const selectors: Array<[string, string]> = [
+    ["meta[property='og:image']", "content"],
+    ["meta[property='og:image:secure_url']", "content"],
+    ["meta[name='twitter:image']", "content"],
+  ];
+  for (const [sel, attr] of selectors) {
+    const el = document.querySelector(sel);
+    if (el) el.setAttribute(attr, url);
+  }
+  document.documentElement.setAttribute("lang", locale === "pt" ? "pt-BR" : locale);
+}
 
 const STORAGE_KEY = "shadow-game-locale";
 
