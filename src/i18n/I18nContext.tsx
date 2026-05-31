@@ -58,6 +58,10 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem(STORAGE_KEY, l);
   }, []);
 
+  useEffect(() => {
+    updatePreviewMeta(locale);
+  }, [locale]);
+
   const value = useMemo(() => ({
     locale,
     t: translations[locale],
