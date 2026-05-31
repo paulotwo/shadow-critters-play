@@ -27,6 +27,7 @@ export default defineConfig(() => ({
       workbox: {
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,webp,jpg,jpeg,woff,woff2}"],
+        maximumFileSizeToCacheInBytes: 4194304,
       },
       manifest: {
         name: "Jogo das Sombras",
