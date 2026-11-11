@@ -3,28 +3,28 @@ import type { AquaticProps } from "./types";
 import AquaticImage from "./AquaticImage";
 
 // Reuse existing animal images for moved creatures
-import whaleImg from "@/assets/animals/whale.png";
-import dolphinImg from "@/assets/animals/dolphin.png";
-import sharkImg from "@/assets/animals/shark.png";
-import octopusImg from "@/assets/animals/octopus.png";
-import fishImg from "@/assets/animals/fish.png";
+import whaleImg from "@/assets/animals/whale.webp";
+import dolphinImg from "@/assets/animals/dolphin.webp";
+import sharkImg from "@/assets/animals/shark.webp";
+import octopusImg from "@/assets/animals/octopus.webp";
+import fishImg from "@/assets/animals/fish.webp";
 
 // New aquatic images
-import seahorseImg from "@/assets/aquatics/seahorse.png";
-import jellyfishImg from "@/assets/aquatics/jellyfish.png";
-import stingrayImg from "@/assets/aquatics/stingray.png";
-import sealImg from "@/assets/aquatics/seal.png";
-import crabImg from "@/assets/aquatics/crab.png";
-import lobsterImg from "@/assets/aquatics/lobster.png";
-import starfishImg from "@/assets/aquatics/starfish.png";
-import narwhalImg from "@/assets/aquatics/narwhal.png";
-import orcaImg from "@/assets/aquatics/orca.png";
-import clownfishImg from "@/assets/aquatics/clownfish.png";
-import squidImg from "@/assets/aquatics/squid.png";
-import walrusImg from "@/assets/aquatics/walrus.png";
-import seaTurtleImg from "@/assets/aquatics/sea_turtle.png";
-import swordfishImg from "@/assets/aquatics/swordfish.png";
-import manateeImg from "@/assets/aquatics/manatee.png";
+import seahorseImg from "@/assets/aquatics/seahorse.webp";
+import jellyfishImg from "@/assets/aquatics/jellyfish.webp";
+import stingrayImg from "@/assets/aquatics/stingray.webp";
+import sealImg from "@/assets/aquatics/seal.webp";
+import crabImg from "@/assets/aquatics/crab.webp";
+import lobsterImg from "@/assets/aquatics/lobster.webp";
+import starfishImg from "@/assets/aquatics/starfish.webp";
+import narwhalImg from "@/assets/aquatics/narwhal.webp";
+import orcaImg from "@/assets/aquatics/orca.webp";
+import clownfishImg from "@/assets/aquatics/clownfish.webp";
+import squidImg from "@/assets/aquatics/squid.webp";
+import walrusImg from "@/assets/aquatics/walrus.webp";
+import seaTurtleImg from "@/assets/aquatics/sea_turtle.webp";
+import swordfishImg from "@/assets/aquatics/swordfish.webp";
+import manateeImg from "@/assets/aquatics/manatee.webp";
 
 export const Whale: React.FC<AquaticProps> = (props) => <AquaticImage {...props} src={whaleImg} alt="Baleia" />;
 export const Dolphin: React.FC<AquaticProps> = (props) => <AquaticImage {...props} src={dolphinImg} alt="Golfinho" />;

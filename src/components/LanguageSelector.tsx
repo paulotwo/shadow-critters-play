@@ -3,12 +3,12 @@ import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import { speakText } from "./gameAudio";
 
-import flagBr from "@/assets/flags/br.png";
-import flagUs from "@/assets/flags/us.png";
-import flagEs from "@/assets/flags/es.png";
-import flagFr from "@/assets/flags/fr.png";
-import flagIt from "@/assets/flags/it.png";
-import flagDe from "@/assets/flags/de.png";
+import flagBr from "@/assets/flags/br.webp";
+import flagUs from "@/assets/flags/us.webp";
+import flagEs from "@/assets/flags/es.webp";
+import flagFr from "@/assets/flags/fr.webp";
+import flagIt from "@/assets/flags/it.webp";
+import flagDe from "@/assets/flags/de.webp";
 
 const SPEECH_LANGS: Record<Locale, string> = {
   pt: "pt-BR", en: "en-US", es: "es-ES", fr: "fr-FR", it: "it-IT", de: "de-DE",

@@ -18,6 +18,13 @@ const stripAnalytics = (): Plugin => ({
     html.replace(/[ \t]*<!-- analytics:start[\s\S]*?<!-- analytics:end -->\r?\n?/, ""),
 });
 
+// As prévias de Open Graph (public/og, ~13 MB) só servem a quem compartilha o
+// link do site; não entram no app.
+const dropWebOnlyFiles = (): Plugin => ({
+  name: "drop-web-only-files",
+  closeBundle: () => fs.rmSync(path.join(projectRoot, "dist", "og"), { recursive: true, force: true }),
+});
+
 export default defineConfig(({ mode }) => {
   const native = mode === "native";
   return {
@@ -32,6 +39,7 @@ export default defineConfig(({ mode }) => {
   plugins: [
     react(),
     native && stripAnalytics(),
+    native && dropWebOnlyFiles(),
     !native && VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt"],
