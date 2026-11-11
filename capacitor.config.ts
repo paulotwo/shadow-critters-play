@@ -10,6 +10,16 @@ const config: CapacitorConfig = {
   android: {
     allowMixedContent: false,
   },
+  plugins: {
+    // Barra de status visível (relógio, rede) sobre o fundo do jogo. O conteúdo
+    // vai de borda a borda (`viewport-fit=cover` no index.html) e se afasta das
+    // barras com `env(safe-area-inset-*)`. Ícones escuros: o fundo é claro.
+    SystemBars: {
+      insetsHandling: "native",
+      initialViewportFitValueHint: "cover",
+      style: "LIGHT",
+    },
+  },
 };
 
 export default config;

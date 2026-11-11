@@ -32,14 +32,18 @@ First deploy requires `wrangler login`. The site is published at `https://shadow
 ### ShadowGame.tsx — central state machine
 
 All gameplay is managed here. Key state:
-- `mode`: `"animals" | "dinos" | "aquatics" | null` — null = intro screen
-- `round`: current `RoundData<T>` with `shadow` (correct answer) and `options` (3 choices)
+- `showIntro`: intro screen vs. game
+- `round`: current `Round` with its own `mode` (`"animals" | "dinos" | "aquatics"`), `shadow` (correct answer) and `options` (3 choices). Everything rendered derives the category from `round.mode`; there is no separate mode state that could disagree with the round.
 - `feedback`: `"correct" | "wrong" | null`
 - `recentShadowsRef`: last 15 creature IDs shown, used by `pickRound<T>` to avoid repetition
 
-**Round flow**: `pickRound<T>` selects 1 correct creature + 2 distractors from the relevant pool, excluding the last 15 seen. Correct answer → sound + TTS + fun fact (300 ms delay) → next round after speech ends (600 ms delay). Wrong answer → sound → next round after 1.2 s. A hint pulses the correct shadow after 5 s of inactivity.
+**Round flow**: `pickRound(mode, recent)` selects 1 correct creature + 2 distractors from the relevant pool, excluding the last 15 seen. Correct answer → sound + TTS + fun fact (300 ms delay) → next round after speech ends (600 ms delay). Wrong answer → sound → next round after 1.2 s. A hint pulses the correct shadow after 5 s of inactivity.
 
 Melody switches every 3 correct answers: `if (newScore % 3 === 0) switchMelody()`.
+
+**Stale flows**: an answer schedules sound, speech and the next round in delayed steps. Schedule them only with `later()` and check `flowRef` after any `await`; `goHome` and `handleStartGame` call `cancelFlow()`, which invalidates every pending step. `busyRef` locks the round on the first tap (the `feedback` state arrives too late for burst taps). Never use a bare `setTimeout` for game flow: a step from an old game firing inside a new one used to crash the app to a blank screen. `GameErrorBoundary` (in `pages/Index.tsx`) remounts the game on any render error.
+
+`node scripts/stress-test.mjs` (against `bun run preview`) clicks everything at random and then checks these invariants; run it after touching the round flow or the audio.
 
 ### Creature data pattern (animals / dinos / aquatics)
 
@@ -72,9 +76,9 @@ Fun facts are separate files per language (not in `translations.ts`) to allow in
 
 Three independent subsystems:
 
-- **Sound effects**: Web Audio API. `playCorrectSound()` / `playWrongSound()` create a fresh `AudioContext` per call.
-- **TTS**: Web Speech API. `prewarmSpeech()` must be called on the intro screen (user-gesture boundary) to unlock iOS audio. `speakText(text, lang)` returns a Promise. Voices are cached in `cachedVoices[]`.
-- **Background music**: Procedural. `MELODIES` array holds 4 hardcoded note sequences. `startBackgroundMusic()` builds an `AudioContext`, schedules notes, and loops. `switchMelody()` closes the old context and starts the next melody. Always call `stopBackgroundMusic()` when leaving the game screen.
+- **Sound effects**: Web Audio API. Effects and music share ONE `AudioContext` (`getCtx()`); never create one per sound, they leak.
+- **TTS**: Web Speech API. `prewarmSpeech()` must be called on the intro screen (user-gesture boundary) to unlock iOS audio. `speakText(text, lang)` returns a Promise that always resolves (end, error, interruption by another speech or `stopSpeech()`, or a 15 s timeout). Voices are cached in `cachedVoices[]`.
+- **Background music**: Procedural. `MELODIES` array holds 4 hardcoded note sequences. `startBackgroundMusic()` opens a music session (a gain node), schedules notes, and loops. `switchMelody()` fades the old session out and starts the next melody. Always call `stopBackgroundMusic()` when leaving the game screen.
 
 ### Native app (Capacitor, Android)
 
@@ -84,7 +88,7 @@ Three independent subsystems:
 - `src/lib/platform.ts` exports `isNative`. Use it for anything that differs in the app.
 - Android WebView has no `speechSynthesis`: on native, `speakText`/`stopSpeech` use `@capacitor-community/text-to-speech`. It needs the `TTS_SERVICE` `<queries>` entry in `AndroidManifest.xml`.
 - `ShadowGame.tsx` handles the Android back button (game → intro → exit app) and stops music/speech when the app goes to background.
-- Fullscreen and portrait come from the shell (`MainActivity.java`, `android:screenOrientation`), so `enterFullscreen()` is a no-op on native. The PWA install banner is hidden.
+- The status bar stays visible over the game background: `SystemBars` in `capacitor.config.ts` + `viewport-fit=cover`, and the screens keep clear of the bars with `env(safe-area-inset-*)`. Do not hide the system bars: Capacitor pads the WebView and a gray band shows up. Portrait comes from `android:screenOrientation`; `enterFullscreen()` is a no-op on native. The PWA install banner is hidden.
 - Icons/splash: `node scripts/gen-app-icons.mjs` builds the icon from the lion art (sources in `assets/`, plus `public/pwa-*.png` and `favicon.ico`); then `bunx capacitor-assets generate --android` writes the Android resources. The launcher name is localized in `android/app/src/main/res/values-*/strings.xml`.
 - After changing web code, run `bun run build:native` before building in Gradle.
 

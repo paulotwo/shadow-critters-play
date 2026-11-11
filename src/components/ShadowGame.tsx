@@ -17,7 +17,7 @@ import {
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
 import { getRandomAquaticFunFact } from "./aquaticFunFacts";
-import { playCorrectSound, playWrongSound, speakText, prewarmSpeech, enterFullscreen, startBackgroundMusic, stopBackgroundMusic, stopSpeech, switchMelody } from "./gameAudio";
+import { playCorrectSound, playWrongSound, speakText, prewarmSpeech, enterFullscreen, setAudioActive, startBackgroundMusic, stopBackgroundMusic, stopSpeech, switchMelody } from "./gameAudio";
 import { App as CapacitorApp } from "@capacitor/app";
 import { Share } from "@capacitor/share";
 import { isNative } from "@/lib/platform";
@@ -59,7 +59,19 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-function pickRound<T>(pool: T[], recentList: T[]): { shadow: T; options: T[] } {
+/**
+ * Uma rodada carrega a própria categoria. Tudo o que a tela mostra sai daqui,
+ * então nunca existe uma criatura de uma categoria sendo procurada na lista
+ * de outra (era isso que derrubava o app ao trocar de jogo no meio da fala).
+ */
+interface Round {
+  mode: GameMode;
+  shadow: CreatureId;
+  options: CreatureId[];
+}
+
+function pickRound(mode: GameMode, recentList: CreatureId[]): Round {
+  const pool = getPool(mode);
   const available = pool.filter((x) => !recentList.includes(x));
   const candidates = available.length >= 3 ? available : pool;
   const shuffled = shuffle(candidates);
@@ -67,7 +79,7 @@ function pickRound<T>(pool: T[], recentList: T[]): { shadow: T; options: T[] } {
   const others = shuffle(pool.filter((x) => x !== shadow));
   const distractors = others.slice(0, 2);
   const options = shuffle([shadow, ...distractors]);
-  return { shadow, options };
+  return { mode, shadow, options };
 }
 
 function getComponents(mode: GameMode) {
@@ -107,10 +119,9 @@ function getModeEmoji(mode: GameMode): string {
 }
 
 const ShadowGame: React.FC = () => {
-  const { locale, setLocale, t, speechLang } = useI18n();
-  const [mode, setMode] = useState<GameMode>("animals");
+  const { locale, t, speechLang } = useI18n();
   const recentShadowsRef = useRef<CreatureId[]>([]);
-  const [round, setRound] = useState(() => pickRound(getPool("animals"), []));
+  const [round, setRound] = useState<Round>(() => pickRound("animals", []));
   const [score, setScore] = useState(0);
   const [total, setTotal] = useState(0);
   const [feedback, setFeedback] = useState<"correct" | "wrong" | null>(null);
@@ -122,6 +133,18 @@ const ShadowGame: React.FC = () => {
   const [funFactsOn, setFunFactsOn] = useState(true);
   const hintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // ---- Controle do fluxo de uma rodada ----
+  // Uma resposta dispara som, fala e a troca de rodada, em etapas com espera.
+  // Se a criança sai do jogo ou começa outro no meio, `cancelFlow()` invalida
+  // tudo o que ainda estava para acontecer: nenhuma etapa antiga mexe na tela
+  // nova. `busyRef` trava a rodada no primeiro toque, antes de o React
+  // redesenhar (o estado `feedback` chega tarde para toques em rajada).
+  const flowRef = useRef(0);
+  const timersRef = useRef(new Set<ReturnType<typeof setTimeout>>());
+  const busyRef = useRef(false);
+  const scoreRef = useRef(0);
+
+  const mode = round.mode;
   const components = getComponents(mode);
   const emojis = getEmojis(mode);
 
@@ -137,17 +160,39 @@ const ShadowGame: React.FC = () => {
     }
   }, []);
 
-  const nextRound = useCallback(() => {
+  const cancelFlow = useCallback(() => {
+    flowRef.current++;
+    timersRef.current.forEach(clearTimeout);
+    timersRef.current.clear();
+    busyRef.current = false;
+  }, []);
+
+  /** setTimeout que só dispara se o fluxo em que nasceu ainda for o atual. */
+  const later = useCallback((fn: () => void, ms: number) => {
+    const flow = flowRef.current;
+    const id = setTimeout(() => {
+      timersRef.current.delete(id);
+      if (flow === flowRef.current) fn();
+    }, ms);
+    timersRef.current.add(id);
+  }, []);
+
+  const resetRoundUi = useCallback(() => {
     clearHintTimer();
     setFeedback(null);
     setFunFact(null);
     setSelectedId(null);
     setHintId(null);
+  }, [clearHintTimer]);
+
+  const nextRound = useCallback(() => {
+    resetRoundUi();
+    busyRef.current = false;
     setRound((prev) => {
       recentShadowsRef.current = [...recentShadowsRef.current, prev.shadow].slice(-15);
-      return pickRound(getPool(mode), recentShadowsRef.current);
+      return pickRound(prev.mode, recentShadowsRef.current);
     });
-  }, [clearHintTimer, mode]);
+  }, [resetRoundUi]);
 
   useEffect(() => {
     if (feedback || showIntro) return;
@@ -161,93 +206,122 @@ const ShadowGame: React.FC = () => {
 
   const handleGuess = useCallback(
     (id: CreatureId) => {
-      if (feedback) return;
+      if (busyRef.current || showIntro) return;
+      busyRef.current = true;
       clearHintTimer();
       setHintId(null);
       setSelectedId(id);
-      setTotal((t) => t + 1);
+      setTotal((n) => n + 1);
       if (id === round.shadow) {
         setFeedback("correct");
-        setScore((s) => {
-          const newScore = s + 1;
-          if (newScore % 3 === 0) switchMelody();
-          return newScore;
-        });
+        scoreRef.current += 1;
+        setScore(scoreRef.current);
+        if (scoreRef.current % 3 === 0) switchMelody();
         const fact = funFactsOn ? getFunFact(mode, round.shadow, locale) : null;
         setFunFact(fact);
         playCorrectSound();
         const name = getCreatureName(mode, round.shadow, t);
         const speechText = fact ? `${name}! ${fact}` : `${name}!`;
-        setTimeout(async () => {
-          await speakText(speechText, speechLang);
-          setTimeout(nextRound, 600);
+        const flow = flowRef.current;
+        later(() => {
+          speakText(speechText, speechLang).then(() => {
+            if (flow === flowRef.current) later(nextRound, 600);
+          });
         }, 300);
       } else {
         setFeedback("wrong");
         playWrongSound();
-        setTimeout(nextRound, 1200);
+        later(nextRound, 1200);
       }
     },
-    [feedback, round.shadow, nextRound, clearHintTimer, mode, locale, t, speechLang, funFactsOn]
+    [showIntro, round.shadow, nextRound, later, clearHintTimer, mode, locale, t, speechLang, funFactsOn]
   );
 
   useEffect(() => {
     if (showIntro) prewarmSpeech();
   }, [showIntro]);
 
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (showIntro && (e.key === "Enter" || e.key === " ")) {
-        setShowIntro(false);
-        enterFullscreen();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [showIntro]);
+  const handleStartGame = useCallback(
+    (selectedMode: GameMode) => {
+      cancelFlow();
+      resetRoundUi();
+      scoreRef.current = 0;
+      setScore(0);
+      setTotal(0);
+      recentShadowsRef.current = [];
+      setRound(pickRound(selectedMode, []));
+      setShowIntro(false);
+      enterFullscreen();
+      if (musicOn) startBackgroundMusic();
+      speakText(getQuestion(selectedMode, t), speechLang);
+    },
+    [cancelFlow, resetRoundUi, musicOn, t, speechLang]
+  );
 
   const goHome = useCallback(() => {
+    cancelFlow();
+    resetRoundUi();
     stopBackgroundMusic();
     stopSpeech();
+    scoreRef.current = 0;
     setShowIntro(true);
     setScore(0);
     setTotal(0);
-  }, []);
+  }, [cancelFlow, resetRoundUi]);
 
-  // App nativo: botão voltar do Android (jogo → início → sai do app) e
-  // silêncio quando o app vai para segundo plano.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (showIntro && (e.key === "Enter" || e.key === " ")) handleStartGame(mode);
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [showIntro, handleStartGame, mode]);
+
+  // Sair da tela (app em segundo plano, aba escondida) silencia tudo; voltar
+  // retoma a música se o jogo estava em andamento com ela ligada.
+  useEffect(() => {
+    const onActiveChange = (isActive: boolean) => {
+      if (!isActive) {
+        stopBackgroundMusic();
+        stopSpeech();
+        setAudioActive(false);
+      } else {
+        setAudioActive(true);
+        if (!showIntro && musicOn) startBackgroundMusic();
+      }
+    };
+    if (isNative) {
+      const state = CapacitorApp.addListener("appStateChange", ({ isActive }) => onActiveChange(isActive));
+      return () => {
+        state.then((h) => h.remove());
+      };
+    }
+    const onVisibility = () => onActiveChange(document.visibilityState === "visible");
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [showIntro, musicOn]);
+
+  // App nativo: botão voltar do Android (jogo → início → sai do app).
   useEffect(() => {
     if (!isNative) return;
     const back = CapacitorApp.addListener("backButton", () => {
       if (showIntro) CapacitorApp.exitApp();
       else goHome();
     });
-    const state = CapacitorApp.addListener("appStateChange", ({ isActive }) => {
-      if (!isActive) {
-        stopBackgroundMusic();
-        stopSpeech();
-      } else if (!showIntro && musicOn) {
-        startBackgroundMusic();
-      }
-    });
     return () => {
       back.then((h) => h.remove());
-      state.then((h) => h.remove());
     };
-  }, [showIntro, musicOn, goHome]);
+  }, [showIntro, goHome]);
 
-  const handleStartGame = (selectedMode: GameMode) => {
-    setMode(selectedMode);
-    setScore(0);
-    setTotal(0);
-    recentShadowsRef.current = [];
-    setRound(pickRound(getPool(selectedMode), []));
-    setShowIntro(false);
-    enterFullscreen();
-    startBackgroundMusic();
-    const question = getQuestion(selectedMode, t);
-    speakText(question, speechLang);
-  };
+  // Ao desmontar (inclusive pela recuperação de erro), nada fica tocando.
+  useEffect(
+    () => () => {
+      cancelFlow();
+      stopBackgroundMusic();
+      stopSpeech();
+    },
+    [cancelFlow]
+  );
 
   const handleShare = async () => {
     const shareData = {
@@ -272,7 +346,7 @@ const ShadowGame: React.FC = () => {
   if (showIntro) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4">
-        <div className="absolute top-4 right-4 flex items-center gap-2">
+        <div className="absolute right-4 top-[calc(1rem+env(safe-area-inset-top))] flex items-center gap-2">
           <button
             onClick={handleShare}
             className="rounded-xl bg-card/80 backdrop-blur px-3 py-2 text-lg transition-transform hover:scale-105 active:scale-95 shadow"
@@ -317,18 +391,21 @@ const ShadowGame: React.FC = () => {
           </div>
           <div className="flex flex-col gap-3 items-center">
             <button
+              data-testid="mode-animals"
               onClick={() => handleStartGame("animals")}
               className="w-56 rounded-full bg-primary px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
             >
               {t.ui.animalsButton}
             </button>
             <button
+              data-testid="mode-aquatics"
               onClick={() => handleStartGame("aquatics")}
               className="w-56 rounded-full bg-[hsl(200,80%,50%)] px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
             >
               {t.ui.aquaticsButton}
             </button>
             <button
+              data-testid="mode-dinos"
               onClick={() => handleStartGame("dinos")}
               className="w-56 rounded-full bg-game-correct px-10 py-4 text-xl font-bold text-primary-foreground shadow-lg transition-transform duration-200 hover:scale-105 active:scale-95"
             >
@@ -344,10 +421,11 @@ const ShadowGame: React.FC = () => {
   const shadowEmoji = (emojis as Record<string, string>)[round.shadow as string];
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-background px-4 py-6">
+    <div className="flex min-h-screen flex-col items-center bg-background px-4 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-[calc(1.5rem+env(safe-area-inset-top))]">
       {/* Header */}
       <div className="mb-6 flex w-full max-w-lg items-center justify-between">
         <button
+          data-testid="home"
           onClick={goHome}
           className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
           title={t.ui.backButton}
@@ -366,6 +444,7 @@ const ShadowGame: React.FC = () => {
               }
             }}
             className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            data-testid="music"
             title={musicOn ? "Mute" : "Unmute"}
           >
             {musicOn ? "🔊" : "🔇"}
@@ -373,6 +452,7 @@ const ShadowGame: React.FC = () => {
           <button
             onClick={() => setFunFactsOn((v) => !v)}
             className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
+            data-testid="facts"
             title={funFactsOn ? "Disable fun facts" : "Enable fun facts"}
           >
             {funFactsOn ? "💡" : "🚫"}
@@ -380,7 +460,7 @@ const ShadowGame: React.FC = () => {
           {langButton}
           <div className="flex items-center gap-2 rounded-full bg-card px-5 py-2 shadow">
             <span className="text-lg">{getModeEmoji(mode)}</span>
-            <span className="text-xl font-bold text-foreground tabular-nums">
+            <span data-testid="score" className="text-xl font-bold text-foreground tabular-nums">
               {score}/{total}
             </span>
           </div>
@@ -399,6 +479,7 @@ const ShadowGame: React.FC = () => {
             ? "animate-shake-wrong ring-4 ring-game-wrong"
             : ""
         }`}
+        data-testid="shadow"
         style={{ width: 220, height: 220 }}
       >
         <ShadowCreature className="h-40 w-40" isShadow />
@@ -445,6 +526,7 @@ const ShadowGame: React.FC = () => {
           return (
             <button
               key={id as string}
+              data-testid="option"
               onClick={() => handleGuess(id)}
               disabled={!!feedback}
               className={`group flex flex-col items-center gap-2 rounded-2xl bg-card p-4 shadow-md transition-all duration-200 ${

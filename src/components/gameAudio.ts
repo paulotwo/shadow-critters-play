@@ -1,10 +1,39 @@
 import { TextToSpeech } from "@capacitor-community/text-to-speech";
 import { isNative } from "@/lib/platform";
 
+// ---------- Contexto de áudio único ----------
+//
+// Efeitos e música usam o MESMO AudioContext. Criar um contexto por som (como
+// era antes) vaza um contexto a cada resposta: o navegador limita quantos podem
+// existir e, com a criança tocando em tudo, o áudio começa a falhar e a travar.
+
+let audioCtx: AudioContext | null = null;
+let audioPaused = false;
+
+function getCtx(): AudioContext | null {
+  try {
+    if (!audioCtx || audioCtx.state === "closed") audioCtx = new AudioContext();
+    if (audioCtx.state === "suspended" && !audioPaused) audioCtx.resume().catch(() => {});
+    return audioCtx;
+  } catch {
+    // Audio not supported – silent fallback
+    return null;
+  }
+}
+
+/** Pausa (app em segundo plano) ou retoma todo o áudio gerado pelo jogo. */
+export function setAudioActive(active: boolean) {
+  audioPaused = !active;
+  if (!audioCtx || audioCtx.state === "closed") return;
+  const change = active ? audioCtx.resume() : audioCtx.suspend();
+  change.catch(() => {});
+}
+
 // Simple correct-answer jingle using Web Audio API
 export function playCorrectSound() {
+  const ctx = getCtx();
+  if (!ctx) return;
   try {
-    const ctx = new AudioContext();
     const notes = [523.25, 659.25, 783.99]; // C5, E5, G5 – happy chord arpeggio
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
@@ -24,8 +53,9 @@ export function playCorrectSound() {
 
 // Wrong-answer buzzer sound
 export function playWrongSound() {
+  const ctx = getCtx();
+  if (!ctx) return;
   try {
-    const ctx = new AudioContext();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.type = "square";
@@ -41,7 +71,7 @@ export function playWrongSound() {
   }
 }
 
-// ---------- Speech API voice cache ----------
+// ---------- Speech ----------
 
 let cachedVoices: SpeechSynthesisVoice[] = [];
 
@@ -53,36 +83,98 @@ function loadVoices() {
 
 /** Call on the home screen to pre-load voices before the first speech request. */
 export function prewarmSpeech() {
-  // No app nativo a fala vem do TTS do sistema: não há contexto para destravar.
-  if (isNative) return;
-  if (!("speechSynthesis" in window)) return;
-  loadVoices();
-  if (cachedVoices.length === 0) {
-    window.speechSynthesis.addEventListener("voiceschanged", loadVoices, { once: true });
+  // No app nativo a fala vem do TTS do sistema: basta acordar o motor cedo,
+  // para ele já estar conectado quando a primeira pergunta for falada.
+  if (isNative) {
+    TextToSpeech.getSupportedLanguages().catch(() => {});
+    return;
   }
-  // Speak a silent utterance to unlock the audio context on mobile
-  const silent = new SpeechSynthesisUtterance(" ");
-  silent.volume = 0;
-  window.speechSynthesis.speak(silent);
+  if (!("speechSynthesis" in window)) return;
+  try {
+    loadVoices();
+    if (cachedVoices.length === 0) {
+      window.speechSynthesis.addEventListener("voiceschanged", loadVoices, { once: true });
+    }
+    // Speak a silent utterance to unlock the audio context on mobile
+    const silent = new SpeechSynthesisUtterance(" ");
+    silent.volume = 0;
+    window.speechSynthesis.speak(silent);
+  } catch {
+    // Speech not available – silent fallback
+  }
 }
 
-// O WebView do Android não implementa `speechSynthesis`; no app a fala usa o
-// TTS do sistema pelo plugin. `speak` resolve quando a fala termina e rejeita
-// se for interrompida ou se o idioma não estiver instalado.
-async function speakNative(text: string, lang: string): Promise<void> {
-  try {
-    await TextToSpeech.stop();
-    await Promise.race([
-      TextToSpeech.speak({ text, lang, rate: 0.9, pitch: 1.2 }),
-      new Promise<void>((resolve) => setTimeout(resolve, 15000)),
-    ]);
-  } catch {
-    // Sem voz para o idioma ou fala interrompida – segue o jogo em silêncio
-  }
+const SPEECH_TIMEOUT_MS = 15000;
+const NATIVE_RETRY_MS = 800;
+
+/** Encerra a promessa da fala em andamento (não a fala em si). */
+let settleCurrentSpeech: (() => void) | null = null;
+
+/**
+ * Fala o texto e resolve quando a fala termina. A promessa SEMPRE resolve:
+ * no fim da fala, em erro, ao ser interrompida por outra fala ou por
+ * `stopSpeech()`, ou depois de `SPEECH_TIMEOUT_MS` — quem espera por ela
+ * nunca fica preso. Uma fala nova interrompe a anterior.
+ *
+ * No app nativo usa o TTS do sistema (o WebView do Android não implementa
+ * `speechSynthesis`); no navegador, a Web Speech API.
+ */
+export function speakText(text: string, lang: string = "pt-BR"): Promise<void> {
+  settleCurrentSpeech?.();
+  return new Promise((resolve) => {
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      clearTimeout(timer);
+      if (settleCurrentSpeech === finish) settleCurrentSpeech = null;
+      resolve();
+    };
+    const timer = setTimeout(finish, SPEECH_TIMEOUT_MS);
+    settleCurrentSpeech = finish;
+
+    try {
+      if (isNative) {
+        // A estratégia padrão do plugin descarta a fala anterior ao começar esta.
+        // Logo depois de abrir o app o motor de TTS pode ainda não estar
+        // conectado e a fala é recusada: tenta de novo enquanto esta fala
+        // ainda for a atual (interrompida ou cancelada, `done` já é true).
+        const attempt = (retriesLeft: number) => {
+          TextToSpeech.speak({ text, lang, rate: 0.9, pitch: 1.2 }).then(finish, () => {
+            if (done || retriesLeft <= 0) finish();
+            else setTimeout(() => !done && attempt(retriesLeft - 1), NATIVE_RETRY_MS);
+          });
+        };
+        attempt(2);
+        return;
+      }
+      if (!("speechSynthesis" in window)) {
+        finish();
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      utterance.rate = 0.9;
+      utterance.pitch = 1.2;
+      const voices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
+      const langPrefix = lang.split("-")[0];
+      const voice = voices.find((v) => v.lang.startsWith(langPrefix));
+      if (voice) utterance.voice = voice;
+      utterance.onend = finish;
+      utterance.onerror = finish;
+      window.speechSynthesis.speak(utterance);
+    } catch {
+      finish();
+    }
+  });
 }
 
 /** Interrompe a fala em andamento (sair do jogo, app em segundo plano). */
 export function stopSpeech() {
+  const settle = settleCurrentSpeech;
+  settleCurrentSpeech = null;
+  settle?.();
   try {
     if (isNative) {
       TextToSpeech.stop().catch(() => {});
@@ -94,34 +186,9 @@ export function stopSpeech() {
   }
 }
 
-// Speak text using Web Speech API – returns a promise that resolves when speech ends
-export function speakText(text: string, lang: string = "pt-BR"): Promise<void> {
-  if (isNative) return speakNative(text, lang);
-  return new Promise((resolve) => {
-    try {
-      if (!("speechSynthesis" in window)) { resolve(); return; }
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang;
-      utterance.rate = 0.9;
-      utterance.pitch = 1.2;
-      const voices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
-      const langPrefix = lang.split("-")[0];
-      const voice = voices.find((v) => v.lang.startsWith(langPrefix));
-      if (voice) utterance.voice = voice;
-      utterance.onend = () => resolve();
-      utterance.onerror = () => resolve();
-      window.speechSynthesis.speak(utterance);
-      setTimeout(resolve, 15000);
-    } catch {
-      resolve();
-    }
-  });
-}
-
 // ---------- Background Music (procedural, cheerful loop) ----------
 
-let bgCtx: AudioContext | null = null;
+/** Ganho da "sessão" de música atual; desligá-lo silencia as notas já agendadas. */
 let bgGain: GainNode | null = null;
 let bgInterval: ReturnType<typeof setInterval> | null = null;
 let bgPlaying = false;
@@ -163,32 +230,45 @@ const MELODIES: { melody: number[]; bass: number[]; tempo: number; melodyType: O
 
 let currentMelodyIndex = 0;
 
-function playBgNote(ctx: AudioContext, freq: number, time: number, duration: number, type: OscillatorType, volume: number) {
+function playBgNote(
+  ctx: AudioContext,
+  out: GainNode,
+  freq: number,
+  time: number,
+  duration: number,
+  type: OscillatorType,
+  volume: number,
+) {
   const osc = ctx.createOscillator();
   const gain = ctx.createGain();
   osc.type = type;
   osc.frequency.value = freq;
   gain.gain.setValueAtTime(volume, time);
   gain.gain.exponentialRampToValueAtTime(0.001, time + duration * 0.95);
-  osc.connect(gain).connect(bgGain!);
+  osc.connect(gain).connect(out);
   osc.start(time);
   osc.stop(time + duration);
 }
 
 function scheduleMelodyLoop() {
-  if (!bgCtx || !bgGain || !bgPlaying) return;
-  const ctx = bgCtx;
-  const m = MELODIES[currentMelodyIndex];
-  const noteDuration = m.tempo;
-  const startTime = ctx.currentTime + 0.05;
+  const ctx = audioCtx;
+  const out = bgGain;
+  if (!ctx || !out || !bgPlaying || ctx.state !== "running") return;
+  try {
+    const m = MELODIES[currentMelodyIndex];
+    const noteDuration = m.tempo;
+    const startTime = ctx.currentTime + 0.05;
 
-  m.melody.forEach((freq, i) => {
-    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, m.melodyType, 0.08);
-  });
+    m.melody.forEach((freq, i) => {
+      playBgNote(ctx, out, freq, startTime + i * noteDuration, noteDuration * 0.9, m.melodyType, 0.08);
+    });
 
-  m.bass.forEach((freq, i) => {
-    playBgNote(ctx, freq, startTime + i * noteDuration, noteDuration * 0.9, m.bassType, 0.06);
-  });
+    m.bass.forEach((freq, i) => {
+      playBgNote(ctx, out, freq, startTime + i * noteDuration, noteDuration * 0.9, m.bassType, 0.06);
+    });
+  } catch {
+    // Audio not supported
+  }
 }
 
 function restartLoop() {
@@ -201,16 +281,46 @@ function restartLoop() {
   }, loopDuration);
 }
 
+/** Abre uma sessão de música nova; a anterior (se houver) some em 0,3 s. */
+function openMusicSession(ctx: AudioContext) {
+  const old = bgGain;
+  if (old) {
+    try {
+      old.gain.setValueAtTime(old.gain.value, ctx.currentTime);
+      old.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+    } catch {
+      // Audio not supported
+    }
+    setTimeout(() => {
+      try {
+        old.disconnect();
+      } catch {
+        // already disconnected
+      }
+    }, 400);
+  }
+  bgGain = ctx.createGain();
+  bgGain.gain.value = 1;
+  bgGain.connect(ctx.destination);
+}
+
 export function startBackgroundMusic() {
   if (bgPlaying) return;
+  const ctx = getCtx();
+  if (!ctx) return;
   try {
     currentMelodyIndex = 0;
-    bgCtx = new AudioContext();
-    bgGain = bgCtx.createGain();
-    bgGain.gain.value = 1;
-    bgGain.connect(bgCtx.destination);
+    openMusicSession(ctx);
     bgPlaying = true;
-    restartLoop();
+    // Um contexto recém-criado pode levar um instante até rodar.
+    if (ctx.state === "running") restartLoop();
+    else
+      ctx
+        .resume()
+        .then(() => {
+          if (bgPlaying) restartLoop();
+        })
+        .catch(() => {});
   } catch {
     // Audio not supported
   }
@@ -218,24 +328,15 @@ export function startBackgroundMusic() {
 
 export function switchMelody() {
   if (!bgPlaying) return;
-  currentMelodyIndex = (currentMelodyIndex + 1) % MELODIES.length;
-
-  // Close old context to stop all scheduled notes, then create a fresh one
-  if (bgInterval) { clearInterval(bgInterval); bgInterval = null; }
-  const oldCtx = bgCtx;
-  const oldGain = bgGain;
-  if (oldGain && oldCtx) {
-    try { oldGain.gain.linearRampToValueAtTime(0, oldCtx.currentTime + 0.3); } catch {}
-    setTimeout(() => { try { oldCtx.close(); } catch {} }, 400);
-  }
-
+  const ctx = getCtx();
+  if (!ctx) return;
   try {
-    bgCtx = new AudioContext();
-    bgGain = bgCtx.createGain();
-    bgGain.gain.value = 1;
-    bgGain.connect(bgCtx.destination);
+    currentMelodyIndex = (currentMelodyIndex + 1) % MELODIES.length;
+    openMusicSession(ctx);
     restartLoop();
-  } catch {}
+  } catch {
+    // Audio not supported
+  }
 }
 
 export function stopBackgroundMusic() {
@@ -245,18 +346,18 @@ export function stopBackgroundMusic() {
     bgInterval = null;
   }
   if (bgGain) {
-    try { bgGain.gain.setValueAtTime(0, bgCtx?.currentTime ?? 0); } catch {}
-  }
-  if (bgCtx) {
-    try { bgCtx.close(); } catch {}
-    bgCtx = null;
+    try {
+      bgGain.disconnect();
+    } catch {
+      // already disconnected
+    }
     bgGain = null;
   }
 }
 
 // Request fullscreen and lock orientation to portrait
 export function enterFullscreen() {
-  // No app nativo a tela cheia e o retrato são da casca (MainActivity/manifest).
+  // No app nativo a tela e a orientação são da casca (manifesto do Android).
   if (isNative) return;
   try {
     // Skip fullscreen request when running as installed PWA (already fullscreen)
@@ -268,11 +369,17 @@ export function enterFullscreen() {
 
     const el = document.documentElement;
     if (el.requestFullscreen) {
-      el.requestFullscreen().then(() => {
-        try {
-          (screen.orientation as any)?.lock?.("portrait").catch(() => {});
-        } catch {}
-      }).catch(() => {});
+      el.requestFullscreen()
+        .then(() => {
+          try {
+            (screen.orientation as any)?.lock?.("portrait").catch(() => {});
+          } catch {
+            // orientation lock not supported
+          }
+        })
+        .catch(() => {});
     }
-  } catch {}
+  } catch {
+    // fullscreen not supported
+  }
 }
