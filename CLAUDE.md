@@ -50,7 +50,7 @@ components/
   animals/
     types.ts          AnimalId union + AnimalProps interface
     index.ts          animalComponents: Record<AnimalId, React.FC<AnimalProps>>
-    allAnimals.tsx    ~25 stateless components that render one PNG via AnimalImage
+    allAnimals.tsx    ~25 stateless components that render one WebP via AnimalImage
     AnimalImage.tsx   applies CSS brightness(0) shadow filter when isShadow=true
   animalFunFacts.ts       Portuguese facts  Record<AnimalId, string[]>
   animalFunFactsEn.ts     English facts
@@ -58,7 +58,7 @@ components/
   … (one file per language per category)
 ```
 
-Shadow silhouettes are **not SVG** — the same PNG images are darkened with `filter: brightness(0) opacity(0.85)` when `isShadow` is true.
+Shadow silhouettes are **not SVG** — the same WebP images (`src/assets/`) are darkened with `filter: brightness(0) opacity(0.85)` when `isShadow` is true.
 
 Creature names live in `i18n/translations.ts` (`t[locale].animalNames`, `.dinoNames`, `.aquaticNames`). The legacy `animalNames` export in `animals/index.ts` is unused.
 
@@ -85,7 +85,7 @@ Three independent subsystems:
 - Android WebView has no `speechSynthesis`: on native, `speakText`/`stopSpeech` use `@capacitor-community/text-to-speech`. It needs the `TTS_SERVICE` `<queries>` entry in `AndroidManifest.xml`.
 - `ShadowGame.tsx` handles the Android back button (game → intro → exit app) and stops music/speech when the app goes to background.
 - Fullscreen and portrait come from the shell (`MainActivity.java`, `android:screenOrientation`), so `enterFullscreen()` is a no-op on native. The PWA install banner is hidden.
-- Icons/splash: sources in `assets/`, regenerate with `bunx capacitor-assets generate --android`. The launcher name is localized in `android/app/src/main/res/values-*/strings.xml`.
+- Icons/splash: `node scripts/gen-app-icons.mjs` builds the icon from the lion art (sources in `assets/`, plus `public/pwa-*.png` and `favicon.ico`); then `bunx capacitor-assets generate --android` writes the Android resources. The launcher name is localized in `android/app/src/main/res/values-*/strings.xml`.
 - After changing web code, run `bun run build:native` before building in Gradle.
 
 ### Styling
