@@ -1,3 +1,6 @@
+import { TextToSpeech } from "@capacitor-community/text-to-speech";
+import { isNative } from "@/lib/platform";
+
 // Simple correct-answer jingle using Web Audio API
 export function playCorrectSound() {
   try {
@@ -50,6 +53,8 @@ function loadVoices() {
 
 /** Call on the home screen to pre-load voices before the first speech request. */
 export function prewarmSpeech() {
+  // No app nativo a fala vem do TTS do sistema: não há contexto para destravar.
+  if (isNative) return;
   if (!("speechSynthesis" in window)) return;
   loadVoices();
   if (cachedVoices.length === 0) {
@@ -61,8 +66,37 @@ export function prewarmSpeech() {
   window.speechSynthesis.speak(silent);
 }
 
+// O WebView do Android não implementa `speechSynthesis`; no app a fala usa o
+// TTS do sistema pelo plugin. `speak` resolve quando a fala termina e rejeita
+// se for interrompida ou se o idioma não estiver instalado.
+async function speakNative(text: string, lang: string): Promise<void> {
+  try {
+    await TextToSpeech.stop();
+    await Promise.race([
+      TextToSpeech.speak({ text, lang, rate: 0.9, pitch: 1.2 }),
+      new Promise<void>((resolve) => setTimeout(resolve, 15000)),
+    ]);
+  } catch {
+    // Sem voz para o idioma ou fala interrompida – segue o jogo em silêncio
+  }
+}
+
+/** Interrompe a fala em andamento (sair do jogo, app em segundo plano). */
+export function stopSpeech() {
+  try {
+    if (isNative) {
+      TextToSpeech.stop().catch(() => {});
+    } else if ("speechSynthesis" in window) {
+      window.speechSynthesis.cancel();
+    }
+  } catch {
+    // Fala indisponível – nada a interromper
+  }
+}
+
 // Speak text using Web Speech API – returns a promise that resolves when speech ends
 export function speakText(text: string, lang: string = "pt-BR"): Promise<void> {
+  if (isNative) return speakNative(text, lang);
   return new Promise((resolve) => {
     try {
       if (!("speechSynthesis" in window)) { resolve(); return; }
@@ -222,6 +256,8 @@ export function stopBackgroundMusic() {
 
 // Request fullscreen and lock orientation to portrait
 export function enterFullscreen() {
+  // No app nativo a tela cheia e o retrato são da casca (MainActivity/manifest).
+  if (isNative) return;
   try {
     // Skip fullscreen request when running as installed PWA (already fullscreen)
     const isStandalone =

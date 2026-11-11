@@ -13,6 +13,10 @@ bun run lint       # ESLint
 bun run format     # Prettier
 bun test           # Vitest (single run)
 bun run test:watch # Vitest watch mode
+bun run build:native  # vite build --mode native + cap sync android
+bun run android:apk   # debug APK → android/app/build/outputs/apk/debug/
+bun run android:aab   # release AAB (needs signing config, not set up yet)
+bun run android:open  # open android/ in Android Studio
 ```
 
 First deploy requires `wrangler login`. The site is published at `https://shadow-critters-play.ksepisteme.com.br/`.
@@ -71,6 +75,18 @@ Three independent subsystems:
 - **Sound effects**: Web Audio API. `playCorrectSound()` / `playWrongSound()` create a fresh `AudioContext` per call.
 - **TTS**: Web Speech API. `prewarmSpeech()` must be called on the intro screen (user-gesture boundary) to unlock iOS audio. `speakText(text, lang)` returns a Promise. Voices are cached in `cachedVoices[]`.
 - **Background music**: Procedural. `MELODIES` array holds 4 hardcoded note sequences. `startBackgroundMusic()` builds an `AudioContext`, schedules notes, and loops. `switchMelody()` closes the old context and starts the next melody. Always call `stopBackgroundMusic()` when leaving the game screen.
+
+### Native app (Capacitor, Android)
+
+`capacitor.config.ts` (appId `com.pjdev.shadowcrittersplay`) wraps `dist/` with no `server.url`: the bundle ships inside the app and runs at `https://localhost`. `android/` is committed; `android/local.properties` (SDK path) is not.
+
+- `vite build --mode native` drops `VitePWA` (no service worker) and strips the `analytics:start`/`analytics:end` block from `index.html` (no analytics in the app: Play Families Policy). The web build keeps both.
+- `src/lib/platform.ts` exports `isNative`. Use it for anything that differs in the app.
+- Android WebView has no `speechSynthesis`: on native, `speakText`/`stopSpeech` use `@capacitor-community/text-to-speech`. It needs the `TTS_SERVICE` `<queries>` entry in `AndroidManifest.xml`.
+- `ShadowGame.tsx` handles the Android back button (game → intro → exit app) and stops music/speech when the app goes to background.
+- Fullscreen and portrait come from the shell (`MainActivity.java`, `android:screenOrientation`), so `enterFullscreen()` is a no-op on native. The PWA install banner is hidden.
+- Icons/splash: sources in `assets/`, regenerate with `bunx capacitor-assets generate --android`. The launcher name is localized in `android/app/src/main/res/values-*/strings.xml`.
+- After changing web code, run `bun run build:native` before building in Gradle.
 
 ### Styling
 

@@ -17,7 +17,10 @@ import {
 import { getRandomFunFact } from "./animalFunFacts";
 import { getRandomDinoFunFact } from "./dinoFunFacts";
 import { getRandomAquaticFunFact } from "./aquaticFunFacts";
-import { playCorrectSound, playWrongSound, speakText, prewarmSpeech, enterFullscreen, startBackgroundMusic, stopBackgroundMusic, switchMelody } from "./gameAudio";
+import { playCorrectSound, playWrongSound, speakText, prewarmSpeech, enterFullscreen, startBackgroundMusic, stopBackgroundMusic, stopSpeech, switchMelody } from "./gameAudio";
+import { App as CapacitorApp } from "@capacitor/app";
+import { Share } from "@capacitor/share";
+import { isNative } from "@/lib/platform";
 import { useI18n } from "@/i18n";
 import type { Locale } from "@/i18n/translations";
 import LanguageSelector from "./LanguageSelector";
@@ -203,6 +206,36 @@ const ShadowGame: React.FC = () => {
     return () => window.removeEventListener("keydown", handler);
   }, [showIntro]);
 
+  const goHome = useCallback(() => {
+    stopBackgroundMusic();
+    stopSpeech();
+    setShowIntro(true);
+    setScore(0);
+    setTotal(0);
+  }, []);
+
+  // App nativo: botão voltar do Android (jogo → início → sai do app) e
+  // silêncio quando o app vai para segundo plano.
+  useEffect(() => {
+    if (!isNative) return;
+    const back = CapacitorApp.addListener("backButton", () => {
+      if (showIntro) CapacitorApp.exitApp();
+      else goHome();
+    });
+    const state = CapacitorApp.addListener("appStateChange", ({ isActive }) => {
+      if (!isActive) {
+        stopBackgroundMusic();
+        stopSpeech();
+      } else if (!showIntro && musicOn) {
+        startBackgroundMusic();
+      }
+    });
+    return () => {
+      back.then((h) => h.remove());
+      state.then((h) => h.remove());
+    };
+  }, [showIntro, musicOn, goHome]);
+
   const handleStartGame = (selectedMode: GameMode) => {
     setMode(selectedMode);
     setScore(0);
@@ -222,7 +255,12 @@ const ShadowGame: React.FC = () => {
       text: t.ui.shareText,
       url: window.location.href,
     };
-    if (navigator.share) {
+    if (isNative) {
+      // O WebView não tem `navigator.share` e a URL dele é https://localhost.
+      try {
+        await Share.share({ ...shareData, url: "https://shadow-critters-play.ksepisteme.com.br/" });
+      } catch { /* user cancelled */ }
+    } else if (navigator.share) {
       try { await navigator.share(shareData); } catch { /* user cancelled */ }
     } else {
       await navigator.clipboard.writeText(`${shareData.text}\n${shareData.url}`);
@@ -310,12 +348,7 @@ const ShadowGame: React.FC = () => {
       {/* Header */}
       <div className="mb-6 flex w-full max-w-lg items-center justify-between">
         <button
-          onClick={() => {
-            stopBackgroundMusic();
-            setShowIntro(true);
-            setScore(0);
-            setTotal(0);
-          }}
+          onClick={goHome}
           className="rounded-lg bg-muted px-3 py-2 text-lg transition-transform active:scale-95"
           title={t.ui.backButton}
         >

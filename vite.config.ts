@@ -1,4 +1,4 @@
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import fs from "fs";
@@ -10,7 +10,17 @@ import { VitePWA } from "vite-plugin-pwa";
 const projectRoot = fs.realpathSync.native(path.resolve(__dirname));
 
 // https://vitejs.dev/config/
-export default defineConfig(() => ({
+// Build do app (Capacitor): `vite build --mode native`. Sem service worker
+// (o bundle já vai dentro do app) e sem analytics (Política de Famílias do Play).
+const stripAnalytics = (): Plugin => ({
+  name: "strip-analytics",
+  transformIndexHtml: (html) =>
+    html.replace(/[ \t]*<!-- analytics:start[\s\S]*?<!-- analytics:end -->\r?\n?/, ""),
+});
+
+export default defineConfig(({ mode }) => {
+  const native = mode === "native";
+  return {
   root: projectRoot,
   server: {
     host: "::",
@@ -21,7 +31,8 @@ export default defineConfig(() => ({
   },
   plugins: [
     react(),
-    VitePWA({
+    native && stripAnalytics(),
+    !native && VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt"],
       workbox: {
@@ -54,4 +65,5 @@ export default defineConfig(() => ({
       "@": path.join(projectRoot, "src"),
     },
   },
-}));
+  };
+});
